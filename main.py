@@ -1,14 +1,13 @@
 from telegram import Update
-from telegram.ext import filters
-from telegram.ext import CommandHandler, MessageHandler, CallbackQueryHandler
-from handlers import start, set_event
+from telegram.ext import CommandHandler, CallbackQueryHandler
+from handlers import start, button
 from globals import application, logger
 
 
 def main():
     application.add_handler(CommandHandler(["start"], start))
-    application.add_handler(MessageHandler(filters.TEXT, set_event))
     application.add_error_handler(error_handler)
+    application.add_handler(CallbackQueryHandler(button))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
