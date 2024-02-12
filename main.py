@@ -1,8 +1,11 @@
-from telegram.ext import CommandHandler, CallbackQueryHandler, PreCheckoutQueryHandler, filters, \
+from telegram.ext import CallbackQueryHandler, PreCheckoutQueryHandler, filters, \
     MessageHandler
-from handlers import start, button, handle_pre_checkout, successful_payment_callback
-from globals import application, logger
+from button_handlers import button
+from payment import successful_payment_callback, handle_pre_checkout
+from data.globals import application, logger
+from onboarding import start
 from telegram import Update
+from telegram.ext import CommandHandler
 
 
 def main():
@@ -11,7 +14,6 @@ def main():
     application.add_error_handler(error_handler)
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
-
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 

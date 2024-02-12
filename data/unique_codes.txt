@@ -1,0 +1,222 @@
+API Development - 4100
+Microservices - 4101
+Database Management - 4102
+Cloud Services - 4103
+Serverless Architecture - 4104
+Python - 1105
+Java - 1106
+Node.js - 1107
+Go - 1108
+Django - 2109
+Spring Boot - 2110
+Express - 2111
+Gin - 2112
+Postman - 31131
+Swagger - 31141
+Docker - 31151
+Kubernetes - 31161
+C# - 1117
+Flask - 2118
+.NET Core - 2119
+RabbitMQ - 31201
+Consul - 31211
+SQL - 1122
+NoSQL - 1123
+MySQL - 2124
+PostgreSQL - 2125
+MongoDB - 2126
+Cassandra - 2127
+DBeaver - 31281
+MongoDB Compass - 31291
+pgAdmin - 31301
+AWS Lambda - 2131
+Google Cloud Functions - 2132
+Azure Functions - 2133
+Terraform - 31341
+CloudFormation - 31351
+Google Cloud Deployment Manager - 31361
+Serverless Framework - 2137
+SAM - 2138
+Cloudflare Workers - 2139
+AWS SAM CLI - 31401
+Google Cloud CLI - 31411
+iOS Development - 4142
+Android Development - 4143
+Web Development - 4144
+Cross-platform Development - 4145
+Desktop Development - 4146
+Swift - 1147
+Objective-C - 1148
+UIKit - 2149
+SwiftUI - 2150
+Xcode - 31511
+CocoaPods - 31521
+Fastlane - 31531
+Kotlin - 1154
+Android SDK - 2155
+Jetpack - 2156
+Android Studio - 31571
+Gradle - 31581
+Firebase - 31591
+HTML - 1160
+CSS - 1161
+JavaScript - 1162
+TypeScript - 1163
+React - 2164
+Vue.js - 2165
+Angular - 2166
+Svelte - 2167
+Webpack - 31681
+Babel - 31691
+ESLint - 31701
+Dart - 1171
+Flutter - 2172
+React Native - 2173
+Xamarin - 2174
+Visual Studio Code - 31751
+.NET - 2176
+JavaFX - 2177
+Electron - 2178
+Visual Studio - 31791
+IntelliJ IDEA - 31801
+Electron Packager - 31811
+Cloud Infrastructure - 4182
+CI/CD Pipelines - 4183
+Monitoring and Logging - 4184
+Infrastructure as Code - 4185
+Containerization - 4186
+Ruby - 1187
+Shell Scripting - 1188
+AWS Cloud Development Kit (CDK) - 2189
+Ansible - 31901
+Groovy - 1191
+YAML - 1192
+Jenkins - 31931
+GitLab CI - 31941
+CircleCI - 31951
+Jenkins Pipelines - 2196
+GitLab CI/CD - 2197
+Prometheus - 31981
+Grafana - 31991
+ELK Stack - 32001
+ELK Stack (Elasticsearch, Logstash, Kibana) - 2201
+Prometheus + Grafana - 2202
+Puppet - 32031
+Docker Swarm - 32041
+Docker Compose - 2205
+Manual Testing - 4206
+Automated Testing - 4207
+Performance Testing - 4208
+Security Testing - 4209
+API Testing - 4210
+- - 1211
+Markdown (for documentation) - 1212
+JIRA - 32131
+TestRail - 32141
+Confluence - 32151
+Selenium WebDriver - 2216
+Cypress - 2217
+Appium - 2218
+Selenium - 32191
+Puppeteer - 32201
+Apache JMeter - 2221
+LoadRunner - 2222
+Gatling - 2223
+JMeter - 32241
+OWASP ZAP - 32251
+Burp Suite - 32261
+Nessus - 32271
+PyTest - 2228
+Metasploit Framework - 2229
+Nmap Scripting Engine (NSE) - 2230
+SoapUI - 32311
+Katalon Studio - 32321
+Requests - 2233
+Mocha с Chai - 2234
+Spock - 2235
+System Design - 4236
+Microservices Architecture - 4237
+Cloud Architecture - 4238
+High Availability Systems - 4239
+Scalable Systems - 4240
+UML - 1241
+Markdown - 1242
+PlantUML - 1243
+Lucidchart - 32441
+Microsoft Visio - 32451
+Draw.io - 32461
+Spring Cloud - 2247
+Netflix OSS - 2248
+Istio - 32491
+AWS CloudFormation - 2250
+NGINX - 32511
+HAProxy - 32521
+Keepalived - 32531
+Apache ZooKeeper - 2254
+Redis - 32551
+Memcached - 32561
+Varnish - 32571
+Akka - 2258
+Application Security - 4259
+Network Security - 4260
+Cloud Security - 4261
+Penetration Testing - 4262
+Cryptography - 4263
+SonarQube - 32641
+OWASP ESAPI - 2265
+Spring Security - 2266
+Wireshark - 32671
+Nmap - 32681
+Metasploit - 32691
+OpenSSL - 2270
+WireGuard - 2271
+AWS Security Tools - 32721
+Azure Security Center - 32731
+Google Cloud Security Command Center - 32741
+HashiCorp Vault - 2275
+AWS IAM - 2276
+C++ - 1277
+GnuPG - 32781
+Libsodium - 32791
+Crypto++ - 2280
+Machine Learning - 4281
+Data Analysis - 4282
+Big Data - 4283
+AI Development - 4284
+Statistical Modeling - 4285
+R - 1286
+Scala - 1287
+TensorFlow - 32881
+PyTorch - 32891
+Scikit-learn - 32901
+Pandas - 32911
+NumPy - 32921
+Matplotlib - 32931
+Apache Hadoop - 32941
+Apache Spark - 32951
+Apache Flink - 32961
+Keras - 32971
+SAS - 1298
+RStudio - 32991
+Jupyter Notebook - 33001
+Anaconda - 33011
+Stan - 2302
+Business Analysis - 4303
+Systems Design - 4304
+Requirement Analysis - 4305
+Process Modeling - 4306
+Data Modeling - 4307
+Balsamiq - 33081
+Babok - 2309
+System Architect - 2310
+Enterprise Architect - 2311
+Trello - 33121
+ReqIF - 2313
+Rational RequisitePro - 2314
+BPMN - 1315
+Bizagi - 33161
+Aris - 2317
+ERD - 1318
+ER/Studio - 33191
+Navicat - 33201
+PowerDesigner - 2321

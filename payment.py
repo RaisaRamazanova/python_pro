@@ -1,23 +1,33 @@
 from telegram import Update
-from globals import PAYMENTS_TOKEN, MIDDLE_PRICE, SENIOR_PRICE
+from data.globals import PAYMENTS_TOKEN
 from telegram.ext import ContextTypes
-from model import UserLevel
-from telebot import types
-from interactor import delete_message
+from interactor import get_section_data, get_level_data, delete_message, _
+from telebot.types import LabeledPrice
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from screens_bulder import show_section_start_screen
 
 
 async def buy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    level = context.user_data['global']['level']
-    title = "Покупка Middle уровня" if level == UserLevel.unpaid_middle else "Покупка Senior уровня"
-    description = "Доступ к уровню Middle навсегда" if level == UserLevel.unpaid_middle else "Доступ к уровню Senior навсегда"
-    payload = "test-middle-payload" if level == UserLevel.unpaid_middle else "test-senior-payload"
-    currency = "RUB"
-    prices = [MIDDLE_PRICE.to_dict()] if level == UserLevel.unpaid_middle else [SENIOR_PRICE.to_dict()]
+    section_data = get_section_data(context)
+    level_data = get_level_data(context)
 
-    pay_text = "Заплатить {prices} {currency}".format(prices=prices[0]['amount']/100,currency=currency)
-    keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(types.InlineKeyboardButton(pay_text, pay=True))
-    keyboard.add(types.InlineKeyboardButton("Назад ⬅️", callback_data="Назад ⬅️ 1"))
+    title = "Покупка {section} {level} уровня".format(
+        section=section_data.name,
+        level=level_data.name
+    )
+    description = "Доступ к уровню {level} навсегда".format(
+        level=level_data.name
+    )
+    payload = "{section}-{level}-payload".format(
+        section=section_data.name,
+        level=level_data.name
+    )
+    currency = "RUB"
+    prices = [LabeledPrice(label='Покупка {level} тарифа'.format(level=level_data.name), amount=level_data.price).to_dict()]
+    pay_text = "Заплатить {prices} {currency}".format(prices=prices[0]['amount']/100, currency=currency)
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton(pay_text, pay=True))
+    keyboard.add(InlineKeyboardButton("Назад ⬅️", callback_data="Назад ⬅️ 1"))
 
     await delete_message(chat_id=update.effective_chat.id, message_id=update.callback_query.message.message_id)
 
@@ -31,3 +41,21 @@ async def buy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                                    prices=prices,
                                    start_parameter='start_parameter',
                                    reply_markup=keyboard.to_json())
+
+
+async def handle_pre_checkout(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.pre_checkout_query
+
+    section_data = get_section_data(context)
+    level_data = get_level_data(context)
+
+    if query.invoice_payload != '{section}-{level}-payload'.format(section=section_data.name, level=level_data.name):
+        await query.answer(ok=False, error_message=_(context, "Something went wrong with the payment"))
+    else:
+        await query.answer(ok=True)
+        level_data.is_paid = True
+        await show_section_start_screen(update, context)
+
+
+async def successful_payment_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await show_section_start_screen(update, context)

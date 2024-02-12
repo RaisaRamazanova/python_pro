@@ -1,73 +1,23 @@
-from telebot.types import InlineKeyboardMarkup
-from globals import application
-from telegram import Update
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from data.translations import translations
+from data.globals import application
 from telegram.ext import ContextTypes
-from telebot import types
 import random
-from model import UserLevel
+from model import UserData, Level, Section, Interview, Theme
+from telegram import Update
+from collections import Counter
 
 
-def initialize_states(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if 'global' not in context.user_data:
-        context.user_data['global'] = {
-            'chat_id': update.message.chat.id,
-            'level': UserLevel.junior,
-            'result': [0, 0, 0],
-            'access': [True, False, False],
-            'invoice_message_id': 0,
-
-        }
-    if 'junior'not in context.user_data:
-        update_junior_context(context)
-    if 'middle'not in context.user_data:
-        update_middle_context(context)
-    if 'senior'not in context.user_data:
-        update_senior_context(context)
+def get_chat_id(update: Update):
+    return update.message.chat_id if update.message else update.callback_query.message.chat_id
 
 
-def update_junior_context(context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['junior'] = {
-        'number_of_correct': 0,
-        'number_of_incorrect': 0,
-        'correct_answer_index': 0,
-        'selected_id_list': [],
-        'question': '',
-        'list_of_answers': [],
-        'explanation': '',
-        'number_of_question': 0,
-        'explanation_code': ''
-    }
+def get_message_id(update: Update):
+    return update.message.message_id if update.message else update.message.chat.id
 
 
-def update_middle_context(context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['middle'] = {
-        'number_of_correct': 0,
-        'number_of_incorrect': 0,
-        'correct_answer_index': 0,
-        'selected_id_list': [],
-        'question': '',
-        'list_of_answers': [],
-        'explanation': '',
-        'number_of_question': 0,
-        'explanation_code': ''
-    }
-
-
-def update_senior_context(context: ContextTypes.DEFAULT_TYPE):
-    context.user_data['senior'] = {
-        'number_of_correct': 0,
-        'number_of_incorrect': 0,
-        'correct_answer_index': 0,
-        'selected_id_list': [],
-        'question': '',
-        'list_of_answers': [],
-        'explanation': '',
-        'number_of_question': 0,
-        'explanation_code': ''
-    }
-
-
-async def send_message(chat_id: int, text: str, reply_markup: InlineKeyboardMarkup | None = None, parse_mode: str = 'HTML'):
+async def send_message(chat_id: int, text: str, reply_markup: InlineKeyboardMarkup | None = None,
+                       parse_mode: str = 'HTML'):
     try:
         await application.bot.send_message(
             chat_id=chat_id,
@@ -80,10 +30,11 @@ async def send_message(chat_id: int, text: str, reply_markup: InlineKeyboardMark
             text=text,
             parse_mode=parse_mode
         )
-        print(f"Произошла ошибка при изменении сообщения: {e}")
+        print(f"Произошла ошибка при отправке сообщения: {e}")
 
 
-async def edit_message(chat_id: int, message_id: int, text: str, reply_markup: InlineKeyboardMarkup | None = None, parse_mode: str = 'HTML'):
+async def edit_message(chat_id: int, message_id: int, text: str, reply_markup: InlineKeyboardMarkup | None = None,
+                       parse_mode: str = 'HTML'):
     try:
         await application.bot.edit_message_text(
             chat_id=chat_id,
@@ -117,19 +68,100 @@ async def delete_message(chat_id: int, message_id: int):
         print(e)
 
 
-async def create_buttons(list_of_buttons) -> []:
-    return list(
-        map(lambda button, i: types.InlineKeyboardButton(text=button, callback_data=str(list_of_buttons[i])),
-            list_of_buttons,
-            range(0, len(list_of_buttons))))
+async def create_buttons(list_of_buttons):
+    if isinstance(list_of_buttons, list):
+        return [InlineKeyboardButton(text=button, callback_data=button)
+                for i, button in enumerate(list_of_buttons)]
+
+    elif isinstance(list_of_buttons, dict):
+        return [InlineKeyboardButton(text=value, callback_data=str(key))
+                for key, value in list_of_buttons.items()]
+
+    else:
+        raise TypeError("list_of_buttons должен быть типа list или dict")
 
 
-def get_random_number(context: ContextTypes.DEFAULT_TYPE, level: str) -> int:
-    random_number = random.randint(0, 3)
+def get_random_number(context: ContextTypes.DEFAULT_TYPE, selected_id_list: [], end: int = 3) -> int:
+    random_number = random.randint(0, end)
 
-    if random_number in context.user_data[level]['selected_id_list']:
+    if random_number in selected_id_list:
         print(f"Generated {random_number}")
-        return get_random_number(context, level)
+        return get_random_number(context, selected_id_list)
 
     print(f"Generated {random_number}, it's not in the list.")
     return random_number
+
+
+def get_data(context: ContextTypes.DEFAULT_TYPE) -> UserData | None:
+    if 'data' in context.user_data:
+        return context.user_data['data']
+    else:
+        return None
+
+
+def get_level_name(context: ContextTypes.DEFAULT_TYPE) -> str:
+    data = get_data(context)
+    if data is not None:
+        return data.common_data.level
+    return ""
+
+
+def get_level_data(context: ContextTypes.DEFAULT_TYPE) -> Level | None:
+    data = get_data(context)
+    section = get_section_data(context)
+    if data is not None:
+        for level in section.levels:
+            if level.name == data.common_data.level:
+                return level
+    return None
+
+
+def get_interview_data(context: ContextTypes.DEFAULT_TYPE) -> Interview | None:
+    data = get_data(context)
+    if data is not None:
+        return data.interview_data
+    return None
+
+
+def get_section_data(context: ContextTypes.DEFAULT_TYPE) -> Section | None:
+    data = get_data(context)
+    theme = get_theme(context)
+    if data is not None:
+        for s in theme.sections:
+            if s.name == data.common_data.section:
+                return s
+    return None
+
+
+def get_theme(context: ContextTypes.DEFAULT_TYPE) -> Theme | None:
+    data = get_data(context)
+    if data is not None:
+        for theme in data.theme_data:
+            if theme.name == data.common_data.theme:
+                return theme
+    return None
+
+
+def remove_most_frequent_elements(lst) -> []:
+    if lst:
+        element_counts = Counter(lst)
+        max_count = max(element_counts.values())
+        filtered_list = [element for element in lst if element_counts[element] != max_count]
+        return filtered_list
+    return []
+
+
+async def add_jump_button(button_text, callback_data='') -> InlineKeyboardMarkup:
+    keyboard_button = InlineKeyboardButton(text=button_text,
+                                           callback_data=button_text if callback_data == '' else callback_data)
+    reply_markup = InlineKeyboardMarkup(row_width=1)
+    reply_markup.add(keyboard_button)
+    return reply_markup
+
+
+def change_level(context, level: str):
+    context.user_data['data'].common_data.level = level
+
+
+def _(context: ContextTypes.DEFAULT_TYPE, message: str):
+    return translations[context.user_data['data'].common_data.user_language].get(message, "Translation not found")

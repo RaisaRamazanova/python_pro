@@ -1,9 +1,9 @@
 import sqlite3
 from sqlite3 import Error, Connection
 import random
-import handlers
-from globals import path_questions, path_answers
-from sql_data import *
+import test_process
+from data.globals import data_path
+from data.python_sql_data import *
 
 
 def create_connection(path) -> Connection | None:
@@ -17,27 +17,21 @@ def create_connection(path) -> Connection | None:
     return connection
 
 
-def create_tables(path_questions, path_answers):
-    create_questions_table = """
+def create_tables(path):
+    create_table = """
     CREATE TABLE IF NOT EXISTS questions (
         id INTEGER,
         question TEXT,
         explanation TEXT,
-        explanation_code TEXT
+        explanation_code TEXT,
+        answer_1 TEXT,
+        answer_2 TEXT,
+        answer_3 TEXT,
+        answer_4 TEXT
         );
     """
-    questions_connection = create_connection(path_questions)
-    execute_query(questions_connection, create_questions_table)
-
-    create_answers_table = """
-        CREATE TABLE IF NOT EXISTS answers (
-            id INTEGER,
-            answer TEXT,
-            isRight BOOL
-            );
-        """
-    answers_connection = create_connection(path_answers)
-    execute_query(answers_connection, create_answers_table)
+    connection = create_connection(path)
+    execute_query(connection, create_table)
 
 
 def execute_query(connection, query):
@@ -64,38 +58,24 @@ def execute_query_with_param(connection, sql, val):
         print("MySQL connection is closed")
 
 
-# def add_questions():
-#     levels = ['junior', 'middle', 'senior']
-#     for level in levels:
-#         create_tables(path_questions.format(level=level), path_answers.format(level=level))
-#         for i in range(4):
-#             sql = "INSERT INTO questions (id, question, explanation, explanation_code) VALUES (?, ?, ?, ?)"
-#             val = [(i, questions[i], explanations[i], explanation_code[i]),]
-#             questions_connection = create_connection(path_questions.format(level=level))
-#             execute_query_with_param(questions_connection, sql, val)
-#
-#             for j in range(4):
-#                 sql = "INSERT INTO answers (id, answer, isRight) VALUES (?, ?, ?)"
-#                 val = [(i, answers[i][j], True if j == 0 else False), ]
-#                 answers_connection = create_connection(path_answers.format(level=level))
-#                 execute_query_with_param(answers_connection, sql, val)
-
-
 def add_questions():
     data = {
         'junior': {
+            'id': junior_id,
             'questions': junior_questions,
             'explanations': junior_explanations,
             'explanation_code': junior_explanation_code,
             'answers': junior_answers
         },
         'middle': {
+            'id': middle_id,
             'questions': middle_questions,
             'explanations': middle_explanations,
             'explanation_code': middle_explanation_code,
             'answers': middle_answers
         },
         'senior': {
+            'id': senior_id,
             'questions': senior_questions,
             'explanations': senior_explanations,
             'explanation_code': senior_explanation_code,
@@ -103,40 +83,32 @@ def add_questions():
         }
     }
 
+    create_tables(data_path)
     for level, content in data.items():
-        create_tables(path_questions.format(level=level), path_answers.format(level=level))
-        for i in range(4):
-            sql = "INSERT INTO questions (id, question, explanation, explanation_code) VALUES (?, ?, ?, ?)"
-            val = [(i, content['questions'][i], content['explanations'][i], content['explanation_code'][i]),]
-            questions_connection = create_connection(path_questions.format(level=level))
-            execute_query_with_param(questions_connection, sql, val)
-
-            for j in range(4):
-                sql = "INSERT INTO answers (id, answer, isRight) VALUES (?, ?, ?)"
-                val = [(i, content['answers'][i][j], True if j == 0 else False), ]
-                answers_connection = create_connection(path_answers.format(level=level))
-                execute_query_with_param(answers_connection, sql, val)
+        for i in range(len(content['id'])):
+            sql = (
+                "INSERT INTO questions (id, question, explanation, explanation_code, answer_1, answer_2, answer_3, "
+                "answer_4) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+            val = [(
+                content['id'][i], content['questions'][i], content['explanations'][i], content['explanation_code'][i],
+                content['answers'][i][0], content['answers'][i][1], content['answers'][i][2], content['answers'][i][3]),]
+            data_connection = create_connection(data_path)
+            execute_query_with_param(data_connection, sql, val)
 
 
-async def get_question_from_data(update, context, question_id, level):
-    questions_connection = create_connection(path_questions.format(level=level))
+async def get_question_from_data(update, context, question_id):
+    questions_connection = create_connection(data_path)
 
-    id = question_id
+    # id = question_id
+    id = int(str(11051)+str(question_id)[5:])
     cursor = questions_connection.cursor()
-    cursor.execute('SELECT id, question, explanation, explanation_code FROM questions WHERE id = ?', (id,))
-    question = cursor.fetchall()
+    cursor.execute('SELECT id, question, explanation, explanation_code, answer_1, answer_2, answer_3, answer_4 FROM '
+                   'questions WHERE id = ?', (id,))
+    data = cursor.fetchall()
     questions_connection.commit()
 
-    answers_connection = create_connection(path_answers.format(level=level))
-
-    cursor = answers_connection.cursor()
-    cursor.execute('SELECT id, answer, isRight FROM answers WHERE id = ?', (id,))
-    answers = cursor.fetchall()
-    answers_connection.commit()
-
-    list_of_answers = []
-    for a in answers:
-        list_of_answers.append((a[1], a[2]))
+    last_four_elements=data[0][-4:]
+    list_of_answers = [(last_four_elements[0], 1), (last_four_elements[1], 0), (last_four_elements[2], 0), (last_four_elements[3], 0)]
     random.shuffle(list_of_answers)
 
-    await handlers.show_question(question[0][1], question[0][2], question[0][3], list_of_answers, update, context)
+    await test_process.send_question_data(data[0][1], data[0][2], data[0][3], list_of_answers, question_id, update, context)

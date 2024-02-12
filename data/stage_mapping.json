@@ -1,0 +1,198 @@
+{
+  "Backend": {
+    "options": [
+      "API Development",
+      "Microservices",
+      "Database Management",
+      "Cloud Services",
+      "Serverless Architecture"
+    ],
+    "next": {
+      "API Development": {
+        "languages": [
+          "Python",
+          "Java",
+          "Node.js",
+          "Go"
+        ],
+        "frameworks": [
+          "Django",
+          "Spring Boot",
+          "Express",
+          "Gin"
+        ],
+        "tools": [
+          "Postman",
+          "Swagger",
+          "Docker",
+          "Kubernetes"
+        ]
+      },
+      "Microservices": {
+        "languages": [
+          "Python",
+          "Java",
+          "C#",
+          "Go"
+        ],
+        "frameworks": [
+          "Flask",
+          "Spring Boot",
+          ".NET Core",
+          "Gin"
+        ],
+        "tools": [
+          "Docker",
+          "Kubernetes",
+          "RabbitMQ",
+          "Consul"
+        ]
+      },
+      "Database Management": {
+        "languages": [
+          "SQL",
+          "NoSQL"
+        ],
+        "frameworks": [
+          "MySQL",
+          "PostgreSQL",
+          "MongoDB",
+          "Cassandra"
+        ],
+        "tools": [
+          "DBeaver",
+          "MongoDB Compass",
+          "pgAdmin"
+        ]
+      },
+      "Cloud Services": {
+        "languages": [
+          "Python",
+          "Java",
+          "Node.js"
+        ],
+        "frameworks": [
+          "AWS Lambda",
+          "Google Cloud Functions",
+          "Azure Functions"
+        ],
+        "tools": [
+          "Terraform",
+          "CloudFormation",
+          "Google Cloud Deployment Manager"
+        ]
+      },
+      "Serverless Architecture": {
+        "languages": [
+          "Python",
+          "Node.js",
+          "Go"
+        ],
+        "frameworks": [
+          "Serverless Framework",
+          "SAM",
+          "Cloudflare Workers"
+        ],
+        "tools": [
+          "Serverless Framework",
+          "AWS SAM CLI",
+          "Google Cloud CLI"
+        ]
+      }
+    }
+  },
+  "Frontend": {
+    "options": [
+      "iOS Development",
+      "Android Development",
+      "Web Development",
+      "Cross-platform Development",
+      "Desktop Development"
+    ],
+    "next": {
+      "iOS Development": {
+        "languages": [
+          "Swift",
+          "Objective-C"
+        ],
+        "frameworks": [
+          "UIKit",
+          "SwiftUI"
+        ],
+        "tools": [
+          "Xcode",
+          "CocoaPods",
+          "Fastlane"
+        ]
+      },
+      "Android Development": {
+        "languages": [
+          "Kotlin",
+          "Java"
+        ],
+        "frameworks": [
+          "Android SDK",
+          "Jetpack"
+        ],
+        "tools": [
+          "Android Studio",
+          "Gradle",
+          "Firebase"
+        ]
+      },
+      "Web Development": {
+        "languages": [
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "TypeScript"
+        ],
+        "frameworks": [
+          "React",
+          "Vue.js",
+          "Angular",
+          "Svelte"
+        ],
+        "tools": [
+          "Webpack",
+          "Babel",
+          "ESLint"
+        ]
+      },
+      "Cross-platform Development": {
+        "languages": [
+          "Dart",
+          "JavaScript",
+          "C#"
+        ],
+        "frameworks": [
+          "Flutter",
+          "React Native",
+          "Xamarin"
+        ],
+        "tools": [
+          "Visual Studio Code",
+          "Android Studio",
+          "Xcode"
+        ]
+      },
+      "Desktop Development": {
+        "languages": [
+          "C#",
+          "Java",
+          "JavaScript"
+        ],
+        "frameworks": [
+          ".NET",
+          "JavaFX",
+          "Electron"
+        ],
+        "tools": [
+          "Visual Studio",
+          "IntelliJ IDEA",
+          "Electron Packager"
+        ]
+      }
+    }
+  }
+}

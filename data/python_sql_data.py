@@ -12,6 +12,10 @@ bad_stickers_id_list = [
     'CAACAgIAAxkBAAELPRJlr9_6JDzof7-axb_q02h7FdVx2wACKwUAAiMFDQABW3KWmdNyE8o0BA'
 ]
 
+junior_id = [110510, 110511, 110512, 110513]
+middle_id = [110520, 110521, 110522, 110523]
+senior_id = [110530, 110531, 110532, 110533]
+
 junior_questions = [
     'Какой символ используется для обозначения <u>начала комментария</u> в однострочном комментарии в Python?',
     'Какой из следующих вариантов правильно определяет <u>пустой список</u> в Python?',
