@@ -27,7 +27,7 @@ async def buy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     pay_text = "Заплатить {prices} {currency}".format(prices=prices[0]['amount']/100, currency=currency)
     keyboard = InlineKeyboardMarkup()
     keyboard.add(InlineKeyboardButton(pay_text, pay=True))
-    keyboard.add(InlineKeyboardButton("Назад ⬅️", callback_data="Назад ⬅️ 1"))
+    keyboard.add(InlineKeyboardButton("Назад ⬅️", callback_data="back to pay screen"))
 
     await delete_message(chat_id=update.effective_chat.id, message_id=update.callback_query.message.message_id)
 

@@ -50,13 +50,12 @@ class Level:
 
 class Section:
     def __init__(self, name: str, code: int, levels: List[Level], results: List[int] = None,
-                 invoice_message_id: int = 0, stop_training_button_id: int = 0):
+                 invoice_message_id: int = 0):
         self.name = name
         self.code = code,
         self.levels = levels
         self.results = results
         self.invoice_message_id = invoice_message_id
-        self.stop_training_button_id = stop_training_button_id
 
 
 class Theme:
@@ -67,16 +66,16 @@ class Theme:
 
 class Interview:
     def __init__(self, topics: [str], questions_count: int, variable_data: VariableData, number_of_questions_by_topic: dict,
-                 selected_questions_by_topics: dict, results: int = 0,
-                 invoice_message_id: int = 0, stop_training_button_id: int = 0):
+                 selected_questions_by_topics: dict, number_of_correct_answers_by_topic: dict, results: List[int] = None,
+                 invoice_message_id: int = 0):
         self.topics = topics
         self.results = results
-        self.invoice_message_id = invoice_message_id
-        self.stop_training_button_id = stop_training_button_id
+        self.deleting_message_id = invoice_message_id
         self.questions_count = questions_count
         self.variable_data = variable_data
         self.number_of_questions_by_topic = number_of_questions_by_topic
         self.selected_questions_by_topics = selected_questions_by_topics
+        self.percent_of_correct_answers_by_topic = number_of_correct_answers_by_topic
 
 
 class CommonData:

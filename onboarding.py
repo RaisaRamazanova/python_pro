@@ -1,5 +1,4 @@
 from typing import List
-
 from data import translations
 from interactor import *
 from telegram import CallbackQuery
@@ -28,7 +27,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=welcome_text, reply_markup=reply_markup,
                                    parse_mode='HTML')
-    # add_questions()
 
 
 def initialize_states(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -44,10 +42,12 @@ def initialize_states(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['data'] = UserData(
         interview_data=Interview(
             topics=[],
-            questions_count=3,
+            results=[],
+            questions_count=10,
             variable_data=VariableData(),
             number_of_questions_by_topic={},
-            selected_questions_by_topics={}
+            selected_questions_by_topics={},
+            number_of_correct_answers_by_topic={}
         ),
         common_data=CommonData(
             chat_id=get_chat_id(update)
@@ -78,24 +78,24 @@ def create_themes(context: ContextTypes.DEFAULT_TYPE) -> List[Theme]:
                                 name='Junior',
                                 code=1,
                                 is_paid=True,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData()
                             ),
                             Level(
                                 name='Middle',
                                 code=2,
                                 is_paid=False,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData(),
-                                price=49900
+                                price=29900
                             ),
                             Level(
                                 name='Senior',
                                 code=3,
                                 is_paid=False,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData(),
-                                price=79900
+                                price=29900
                             )
                         ]
                     ))
@@ -109,24 +109,24 @@ def create_themes(context: ContextTypes.DEFAULT_TYPE) -> List[Theme]:
                                 name='Junior',
                                 code=1,
                                 is_paid=True,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData()
                             ),
                             Level(
                                 name='Middle',
                                 code=2,
                                 is_paid=False,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData(),
-                                price=49900
+                                price=29900
                             ),
                             Level(
                                 name='Senior',
                                 code=3,
                                 is_paid=False,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData(),
-                                price=79900
+                                price=29900
                             )
                         ]
                     ))
@@ -140,24 +140,24 @@ def create_themes(context: ContextTypes.DEFAULT_TYPE) -> List[Theme]:
                                 name='Junior',
                                 code=1,
                                 is_paid=True,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData()
                             ),
                             Level(
                                 name='Middle',
                                 code=2,
                                 is_paid=False,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData(),
-                                price=49900
+                                price=29900
                             ),
                             Level(
                                 name='Senior',
                                 code=3,
                                 is_paid=False,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData(),
-                                price=79900
+                                price=29900
                             )
                         ]
                     ))
@@ -171,7 +171,7 @@ def create_themes(context: ContextTypes.DEFAULT_TYPE) -> List[Theme]:
                                 name='Junior',
                                 code=1,
                                 is_paid=True,
-                                questions_count=4,
+                                questions_count=10,
                                 variable_data=VariableData()
                             )
                         ]
@@ -184,15 +184,15 @@ def create_themes(context: ContextTypes.DEFAULT_TYPE) -> List[Theme]:
                 sections=codes_1
             )
             theme_2 = Theme(
-                name=_(context,"Frameworks"),
+                name=_(context, "Frameworks"),
                 sections=codes_2
             )
             theme_3 = Theme(
-                name=_(context,"Tools"),
+                name=_(context, "Tools"),
                 sections=codes_3
             )
             theme_4 = Theme(
-                name=_(context,"Theory"),
+                name=_(context, "Theory"),
                 sections=codes_4
             )
         themes = []
@@ -242,7 +242,7 @@ def assign_codes(context: ContextTypes.DEFAULT_TYPE, data, type=None):
                     context.user_data['unique_codes'][new_path] = context.user_data['code_value']
                 context.user_data['code_value'] += 1
 
-    file_path = '/data/unique_codes.txt'
+    file_path = '/Users/raisatramazanova/development/python_bot/python_pro_bot/data/unique_codes.txt'
 
     with open(file_path, 'w') as file:
         for key, value in context.user_data['unique_codes'].items():
@@ -266,16 +266,18 @@ def select_uniformly(lst, num_selections):
 async def show_onboarding(context: ContextTypes.DEFAULT_TYPE, query: CallbackQuery):
     data = query.data
     stage_texts = {
-        1: (_(context, "Choose the domains:"), _(context, "To subcategories ➡️")),
-        2: (_(context, "Choose the subcategories:"), _(context, "To programming languages ➡️")),
-        3: (_(context,"Choose programming languages:"), _(context,"To frameworks ➡️")),
-        4: (_(context,"Choose frameworks:"), _(context,"To tools ➡️")),
-        5: (_(context,"Choose tools:"), _(context,"To levels ➡️")),
-        6: (_(context,"Choose levels:"), _(context,"Finish ➡️")),
+        1: (_(context, "Choose the domains"), _(context, "To subcategories ➡️")),
+        2: (_(context, "Choose the subcategories"), _(context, "To programming languages ➡️")),
+        3: (_(context, "Choose programming languages"), _(context, "To frameworks ➡️")),
+        4: (_(context, "Choose frameworks"), _(context, "To tools ➡️")),
+        5: (_(context, "Choose tools"), _(context, "To levels ➡️")),
+        6: (_(context, "Choose levels"), _(context, "Finish ➡️")),
     }
 
     if data == 'confirm':
-        if (context.user_data['stage'] == 1 and context.user_data['stage_1_selection'] == []) or  (context.user_data['stage'] == 2 and context.user_data['stage_2_selection'] == []) or (context.user_data['stage'] == 6 and context.user_data['stage_6_selection'] == []) :
+        if (context.user_data['stage'] == 1 and context.user_data['stage_1_selection'] == []) or (
+                context.user_data['stage'] == 2 and context.user_data['stage_2_selection'] == []) or (
+                context.user_data['stage'] == 6 and context.user_data['stage_6_selection'] == []):
             return
         context.user_data['stage'] += 1
         next_stage = context.user_data['stage']
@@ -308,11 +310,13 @@ async def show_onboarding(context: ContextTypes.DEFAULT_TYPE, query: CallbackQue
             get_interview_data(context).number_of_questions_by_topic = {x: uniform_selections.count(x) for x in
                                                                         interview_themes}
             get_interview_data(context).selected_questions_by_topics = {x: 0 for x in interview_themes}
+            get_interview_data(context).percent_of_correct_answers_by_topic = {x: 0 for x in interview_themes}
             for category in context.user_data['stage_2_selection']:
                 context.user_data['data'].interview_data.topics.append(category)
 
             await show_main_screen(context, query)
-    elif data == "back" or data == translations['en']['start'] or data == translations['ru']['start'] or data == "Change interview topics 🔁":
+    elif data == "back" or data == translations['en']['start'] or data == translations['ru'][
+        'start'] or data == _(context, "Change interview topics 🔁"):
         await show_onboarding_page(context, query, stage_texts)
     else:
         update_user_selection(context, data)

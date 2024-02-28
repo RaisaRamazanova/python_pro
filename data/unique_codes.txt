@@ -17,7 +17,7 @@ Docker - 31151
 Kubernetes - 31161
 C# - 1117
 Flask - 2118
-.NET Core - 2119
+NET Core - 2119
 RabbitMQ - 31201
 Consul - 31211
 SQL - 1122

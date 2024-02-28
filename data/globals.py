@@ -1,8 +1,6 @@
 import logging
 import threading
 from telegram.ext import ApplicationBuilder
-from model import Section, Level, VariableData
-
 
 TOKEN = "6914866790:AAHQFOHkYzPqRSByECISnNwGRLy1uXFieU8"
 PAYMENTS_TOKEN = '381764678:TEST:76546'

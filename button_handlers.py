@@ -2,7 +2,7 @@ from interactor import _
 from screens_bulder import *
 from payment import buy
 from onboarding import show_onboarding, return_to_previous_onboarding_step, restart_onboarding, create_themes
-from test_process import show_question_screen, show_answer_feedback
+from test_process import show_question_screen, show_four_answers_feedback, show_one_answer_feedback
 
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -17,25 +17,28 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         _(context, "Save progress and exit"): lambda: save_data_and_exit(update, context),
         _(context, "View training result"): lambda: send_level_completion_message(update, context),
         _(context, "View interview result"): lambda: send_interview_completion_message(update, context),
-        _(context, "Back ⬅️"): lambda: show_section_start_screen(update, context),
-        _(context, "Back ⬅️ 1"): lambda: return_to_pay_screen(update, context),
+        'back to section screen': lambda: show_section_start_screen(update, context),
+        'back to pay screen': lambda: return_to_pay_screen(update, context),
         'back': lambda: return_to_previous_onboarding_step(update, context),
         translations['en']['start']: lambda: change_language_and_show_onboarding(context, query, 'en'),
         translations['ru']['start']: lambda: change_language_and_show_onboarding(context, query, 'ru'),
-        # 'start': lambda: show_menu_screen(context, query),
 
         _(context, "Learn topics 📚"): lambda: show_theme_screen(update, context),
         _(context, "Start the interview 🤺"): lambda: start_interview(update, context),
+        _(context, "interview results"): lambda: show_interview_results_screen(update, context),
         _(context, "Change interview topics 🔁"): lambda: restart_onboarding(context, query),
         _(context, "Buy 💰"): lambda: buy(update, context),
         _(context, "Buy access 💰"): lambda: buy(update, context),
         _(context, 'Next question ➡️'): lambda: show_question_screen(update, context),
-        _(context, "To the main menu ⬅️"): lambda: show_main_screen(context, query),
+        "back to the main menu" : lambda: show_main_screen(context, query),
+        "back to the main menu and delete image": lambda: return_to_main_screen(update, context),
         _(context, "Return to the topics ⬅️"): lambda: show_theme_screen(update, context),
         _(context, "Programming languages"): lambda: change_theme_and_show_learn_topics_screen(update, context, code),
         _(context, "Frameworks"): lambda: change_theme_and_show_learn_topics_screen(update, context, code),
         _(context, "Tools"): lambda: change_theme_and_show_learn_topics_screen(update, context, code),
         _(context, "Theory"): lambda: change_theme_and_show_learn_topics_screen(update, context, code),
+        _(context, 'I don\'t know'):lambda: handle_one_answer_question(update, context, code),
+        _(context, 'I know'): lambda: handle_one_answer_question(update, context, code),
     }
 
     try:
@@ -82,6 +85,26 @@ async def handle_non_numeric_code(update: Update, context: ContextTypes.DEFAULT_
             await start_interview(update, context)
 
 
+async def handle_one_answer_question(update: Update, context: ContextTypes.DEFAULT_TYPE, code: str) -> None:
+    if get_data(context).common_data.is_interview:
+        data = get_interview_data(context)
+        end_button_text = _(context, "View interview result")
+        text = _(context, "Interview\n\n<b>❓Question {number_of_question}/{questions_count}:</b>\n\n").format(
+            number_of_question=data.variable_data.number_of_question,
+            questions_count=data.questions_count
+        )
+    else:
+        data = get_level_data(context)
+        end_button_text = _(context, "View training result")
+        text = _(context, "Preparation for the interview for {name}").format(
+            name=data.name,
+            number_of_question=data.variable_data.number_of_question,
+            questions_count=data.questions_count
+        )
+
+    await show_one_answer_feedback(update, context, True if code == _(context, 'I know') else False, data, text, end_button_text)
+
+
 async def change_language_and_show_onboarding(context: ContextTypes.DEFAULT_TYPE, query: CallbackQuery, language: str):
     context.user_data['data'].common_data.user_language = language
     context.user_data['data'].update(create_themes(context))
@@ -99,6 +122,16 @@ async def return_to_pay_screen(update: Update, context: ContextTypes.DEFAULT_TYP
     section_data = get_section_data(context)
     section_data.invoice_message_id = update.callback_query.message.message_id
     await show_pay_screen(update, context)
+
+
+async def return_to_main_screen(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    interview = get_interview_data(context)
+    interview.deleting_message_id = update.callback_query.message.message_id
+    await delete_message(
+        chat_id=get_data(context).common_data.chat_id,
+        message_id=interview.deleting_message_id
+    )
+    await show_main_screen(context, update.callback_query)
 
 
 async def change_level_and_ask_question(update: Update, context: ContextTypes.DEFAULT_TYPE, level: str):
@@ -131,6 +164,7 @@ async def return_menu_screen(context: ContextTypes.DEFAULT_TYPE, query):
     get_interview_data(context).variable_data.reset()
     for key in get_interview_data(context).selected_questions_by_topics:
         get_interview_data(context).selected_questions_by_topics[key] = 0
+        get_interview_data(context).percent_of_correct_answers_by_topic[key] = 0
     await show_main_screen(context, query)
 
 
@@ -147,7 +181,7 @@ async def send_level_completion_message(update: Update, context: ContextTypes.DE
     await edit_message(
         chat_id=get_data(context).common_data.chat_id,
         message_id=update.callback_query.message.message_id,
-        text=_(context, "<b>You have finished the training on {theme}!</b>\n\nCorrectly completed {percent}% ({correct} out of {questions_count})").format(
+        text=_(context, "You have finished the training on {theme}").format(
             theme=section_data.name,
             percent=percentage_correct,
             correct=level_data.variable_data.number_of_correct,
@@ -162,13 +196,12 @@ async def send_interview_completion_message(update: Update, context: ContextType
     percentage_correct = int((data.variable_data.number_of_correct * 100) / data.questions_count)
     reply_markup = await add_jump_button(_(context, "Finish the interview"))
 
-    if data.results < percentage_correct:
-        data.results = percentage_correct
+    data.results.append(percentage_correct)
 
     await edit_message(
         chat_id=get_data(context).common_data.chat_id,
         message_id=update.callback_query.message.message_id,
-        text=_(context, "<b>You have finished the interview!</b>\n\nCorrectly completed {percent}% ({correct} out of {questions_count})").format(
+        text=_(context, "You have finished the interview").format(
             percent=percentage_correct,
             correct=data.variable_data.number_of_correct,
             questions_count=data.questions_count),
@@ -185,9 +218,9 @@ async def handle_training_process(update: Update, context: ContextTypes.DEFAULT_
         )
     else:
         next_button_text = _(context, "View training result")
-        text = _(context, "Preparation for the interview for {name}\n\n<b>❓Question {number_of_question}/{questions_count}:</b>\n\n").format(
+        text = _(context, "Preparation for the interview for {name}").format(
             name=data.name,
             number_of_question=data.variable_data.number_of_question,
             questions_count=data.questions_count
         )
-    await show_answer_feedback(update, context, selected_answer_index, data, text, next_button_text)
+    await show_four_answers_feedback(update, context, selected_answer_index, data, text, next_button_text)

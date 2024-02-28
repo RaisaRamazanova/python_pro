@@ -38,7 +38,7 @@
         "frameworks": [
           "Flask",
           "Spring Boot",
-          ".NET Core",
+          "NET Core",
           "Gin"
         ],
         "tools": [
@@ -97,100 +97,6 @@
           "Serverless Framework",
           "AWS SAM CLI",
           "Google Cloud CLI"
-        ]
-      }
-    }
-  },
-  "Frontend": {
-    "options": [
-      "iOS Development",
-      "Android Development",
-      "Web Development",
-      "Cross-platform Development",
-      "Desktop Development"
-    ],
-    "next": {
-      "iOS Development": {
-        "languages": [
-          "Swift",
-          "Objective-C"
-        ],
-        "frameworks": [
-          "UIKit",
-          "SwiftUI"
-        ],
-        "tools": [
-          "Xcode",
-          "CocoaPods",
-          "Fastlane"
-        ]
-      },
-      "Android Development": {
-        "languages": [
-          "Kotlin",
-          "Java"
-        ],
-        "frameworks": [
-          "Android SDK",
-          "Jetpack"
-        ],
-        "tools": [
-          "Android Studio",
-          "Gradle",
-          "Firebase"
-        ]
-      },
-      "Web Development": {
-        "languages": [
-          "HTML",
-          "CSS",
-          "JavaScript",
-          "TypeScript"
-        ],
-        "frameworks": [
-          "React",
-          "Vue.js",
-          "Angular",
-          "Svelte"
-        ],
-        "tools": [
-          "Webpack",
-          "Babel",
-          "ESLint"
-        ]
-      },
-      "Cross-platform Development": {
-        "languages": [
-          "Dart",
-          "JavaScript",
-          "C#"
-        ],
-        "frameworks": [
-          "Flutter",
-          "React Native",
-          "Xamarin"
-        ],
-        "tools": [
-          "Visual Studio Code",
-          "Android Studio",
-          "Xcode"
-        ]
-      },
-      "Desktop Development": {
-        "languages": [
-          "C#",
-          "Java",
-          "JavaScript"
-        ],
-        "frameworks": [
-          ".NET",
-          "JavaFX",
-          "Electron"
-        ],
-        "tools": [
-          "Visual Studio",
-          "IntelliJ IDEA",
-          "Electron Packager"
         ]
       }
     }
