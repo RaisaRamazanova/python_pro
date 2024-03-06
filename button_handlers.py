@@ -1,7 +1,7 @@
 from interactor import _
 from screens_bulder import *
 from payment import buy
-from onboarding import return_to_previous_onboarding_step, start_onboarding, show_onboarding_page, show_onboarding
+from onboarding import return_to_previous_onboarding_step, start_onboarding, show_onboarding
 from test_process import show_question_screen, show_four_answers_feedback, show_one_answer_feedback
 
 
@@ -10,6 +10,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await query.answer()
     code = query.data
 
+    print(code)
     actions = {
         _(context, "Return to the main page ⬅️"): lambda: show_learn_topics_screen(update, context),
         _(context, "Finish training"): lambda: return_to_section_start_screen(update, context),
@@ -19,10 +20,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         _(context, "View interview result"): lambda: send_interview_completion_message(update, context),
         'back to section screen': lambda: show_section_start_screen(update, context),
         'back to pay screen': lambda: return_to_pay_screen(update, context),
-        'back': lambda: return_to_previous_onboarding_step(update, context),
+        'back': lambda: return_to_previous_onboarding_step(update, context, query),
         translations['en']['start']: lambda: start_onboarding(update, context, query),
         translations['ru']['start']: lambda: start_onboarding(update, context, query),
-
         _(context, "Learn topics 📚"): lambda: show_theme_screen(update, context),
         _(context, "Start the interview 🤺"): lambda: start_interview(update, context),
         _(context, "interview results"): lambda: show_interview_results_screen(update, context),
@@ -65,22 +65,6 @@ async def handle_numeric_code(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def handle_non_numeric_code(update: Update, context: ContextTypes.DEFAULT_TYPE, code: str,
                                   query: CallbackQuery) -> None:
     await show_onboarding(update, context, query)
-        # if not context.user_data['data'].common_data.is_interview:
-        #     theme = get_theme(context)
-        #     for section in theme.sections:
-        #         for level in section.levels:
-        #             if code == str(section.name):
-        #                 change_section(context, section.name)
-        #                 await show_section_start_screen(update, context)
-        #                 break
-        #             if code == str(section.name) + '_' + str(level.name) and level.is_paid:
-        #                 await change_level_and_ask_question(update, context, level.name)
-        #                 break
-        #             if code == str(section.name) + '_' + str(level.name) and not level.is_paid:
-        #                 await change_level_and_pay(update, context, level.name)
-        #                 break
-        # else:
-        #     await start_interview(update, context)
 
 
 async def handle_one_answer_question(update: Update, context: ContextTypes.DEFAULT_TYPE, code: str) -> None:
@@ -139,12 +123,6 @@ async def change_theme_and_show_learn_topics_screen(update: Update, context: Con
 async def change_level_and_pay(update: Update, context: ContextTypes.DEFAULT_TYPE, level: str):
     change_level(context, level)
     await show_pay_screen(update, context)
-
-
-async def start_interview(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if get_data(context) is not None:
-        get_data(context).common_data.is_interview = True
-        await show_question_screen(update, context)
 
 
 async def return_to_section_start_screen(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -1,4 +1,6 @@
 import time
+from data.globals import dsn
+
 
 class OnboardingStageRepository:
     def __init__(self, db_connection):
@@ -141,3 +143,37 @@ class OnboardingStageRepository:
         except Exception as error:
             print(f"Ошибка при получении ID последнего этапа онбординга: {error}")
             return None
+
+    def return_to_previous_onboarding_step(self, user_id, user_onboarding_id):
+        try:
+            # Устанавливаем соединение с базой данных
+            with self.db_connection.get_connection() as connection:
+                with connection.cursor() as cursor:
+                    # Находим ID текущего шага пользователя
+                    cursor.execute("""
+                            SELECT stage_id FROM user_onboarding_stage
+                            WHERE user_id = %s AND user_onboarding_id = %s
+                            ORDER BY created_at DESC LIMIT 1
+                        """, (user_id, user_onboarding_id))
+                    current_stage = cursor.fetchone()
+                    if current_stage:
+                        current_stage_id = current_stage[0]
+
+                        # Удаляем записи о текущем шаге из user_onboarding_stage_option
+                        cursor.execute("""
+                                DELETE FROM user_onboarding_stage_option
+                                WHERE user_id = %s AND user_onboarding_id = %s AND stage_id = %s
+                            """, (user_id, user_onboarding_id, current_stage_id))
+
+                        # Удаляем запись о текущем шаге из user_onboarding_stage
+                        cursor.execute("""
+                                DELETE FROM user_onboarding_stage
+                                WHERE user_id = %s AND user_onboarding_id = %s AND stage_id = %s
+                            """, (user_id, user_onboarding_id, current_stage_id))
+
+                        # Подтверждаем изменения
+                        connection.commit()
+                    else:
+                        print("Нет текущего шага для пользователя.")
+        except Exception as error:
+            print(f"Ошибка при возвращении к предыдущему шагу онбординга: {error}")

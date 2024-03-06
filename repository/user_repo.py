@@ -19,6 +19,25 @@ class UserRepository:
             print(f"Ошибка при получении языка пользователя: {error}")
             return None
 
+    def get_user_language_code(self, chat_id):
+        """Возвращает код языка пользователя по chat_id."""
+        try:
+            with self.db_connection.get_connection() as connection:
+                with connection.cursor() as cursor:
+                    # Объединяем таблицы `user` и `language` для получения кода языка напрямую
+                    query = """
+                    SELECT l.code 
+                    FROM "user" u
+                    JOIN language l ON u.language_id = l.id
+                    WHERE u.telegram_chat_id = %s AND l.is_enabled = TRUE
+                    """
+                    cursor.execute(query, (chat_id,))
+                    language_code = cursor.fetchone()
+                    return language_code[0] if language_code else None
+        except Exception as error:
+            print(f"Ошибка при получении кода языка пользователя: {error}")
+            return None
+
     def update_language(self, user_id, new_language):
         """Обновляет предпочитаемый язык пользователя."""
         try:

@@ -2,34 +2,55 @@ from interactor import *
 from user_state import *
 from telegram import CallbackQuery
 from interactor import _
+from onboarding import app_config
+from test_process import show_question_screen
 
 
-async def show_main_screen(context: ContextTypes.DEFAULT_TYPE, query: CallbackQuery):
-    data = get_data(context)
-    subcategory = ''
-    for category in context.user_data['stage_2_selection']:
-        subcategory += "\t\t⛳️ {category}\n".format(category=category)
-    text = _(context, "Your personalized interview on").format(
-        subcategory=subcategory
+async def show_main_screen(update: Update, context: ContextTypes.DEFAULT_TYPE, query: CallbackQuery):
+    user_id = app_config['user_repo'].get_user_id(telegram_id=update.effective_user.id)
+    user_onboarding_id = app_config['onboarding_repo'].get_user_onboarding_id(user_id=user_id)
+    categories = app_config['onboarding_stage_option_repo'].get_user_selected_option_names(
+        user_id=user_id,
+        user_onboarding_id=user_onboarding_id,
+        chat_id=get_chat_id(update)
     )
 
-    list_of_buttons = [_(context, "Start the interview 🤺"), _(context, 'interview results'), _(context, "Change interview topics 🔁"), _(context, "Learn topics 📚"), _(context, "Buy access 💰")]
-    keyboard_buttons = await create_buttons(list_of_buttons)
-    reply_markup = InlineKeyboardMarkup(row_width=1)
-    reply_markup.add(*keyboard_buttons)
+    subcategories_text = "\n".join(["\t\t⛳️ {category}".format(category=category) for category in categories])
+
+    text = _(context, "Your personalized interview on").format(subcategory=subcategories_text)
+
+    button_texts = [_(context, "Start the interview 🤺"), _(context, 'interview results'), _(context, "Change interview topics 🔁"), _(context, "Learn topics 📚"), _(context, "Buy access 💰")]
+    keyboard_buttons = await create_buttons(button_texts)
+
+    reply_markup = InlineKeyboardMarkup(row_width=1).add(*keyboard_buttons)
 
     try:
-        await query.edit_message_text(
-            text=text,
-            reply_markup=reply_markup.to_json(),
-            parse_mode="HTML"
-        )
+        await query.edit_message_text(text=text, reply_markup=reply_markup.to_json(), parse_mode="HTML")
     except Exception as e:
-        await send_message(
-            chat_id=data.common_data.chat_id,
-            text=text,
-            reply_markup=reply_markup,
-        )
+        print(f"Error updating message: {e}")
+        await send_message(chat_id=get_chat_id(update), text=text, reply_markup=reply_markup)
+
+
+async def start_interview(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = app_config['user_repo'].get_user_id(telegram_id=update.effective_user.id)
+    user_onboarding_id = app_config['onboarding_repo'].get_user_onboarding_id(user_id=user_id)
+
+    interview_id = app_config['interview_repo'].start_interview(
+        user_id=user_id,
+        chat_id=get_chat_id(update)
+    )
+
+    # interview_id = app_config['interview_repo'].get_last_unfinished_interview_id(
+    #     user_id=user_id,
+    #     chat_id=get_chat_id(update)
+    # )
+
+    app_config['interview_topic_repo'].record_interview_topics(
+        interview_id=interview_id,
+        user_onboarding_id=user_onboarding_id
+    )
+
+    await show_question_screen(update, context)
 
 
 async def show_theme_screen(update: Update, context: ContextTypes.DEFAULT_TYPE):

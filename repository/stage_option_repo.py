@@ -103,52 +103,47 @@ class StageOptionRepository:
             print(f"Ошибка при получении ID опции этапа по названию {option_name}: {error}")
             return None
 
-    def get_next_stage_options(self, user_id, user_onboarding_id, current_stage_id):
-        """Возвращает stage_option для следующего шага на основе выбранных опций текущего stage и индекса следующего stage."""
+    def get_dependent_stage_options(self, user_id, user_onboarding_id, target_stage_id):
+        """Возвращает stage_option для указанного шага на основе ранее выбранных опций или все доступные, если нет зависимых."""
         try:
             with self.db_connection.get_connection() as connection:
                 with connection.cursor() as cursor:
-                    # Определяем индекс текущего stage
-                    cursor.execute("""
-                        SELECT index FROM stage
-                        WHERE id = %s
-                    """, (current_stage_id,))
-                    current_stage_index = cursor.fetchone()[0]
-
-                    # Находим следующий stage по индексу
-                    cursor.execute("""
-                        SELECT id FROM stage
-                        WHERE index = %s + 1 AND is_enabled = TRUE
-                    """, (current_stage_index,))
-                    next_stage = cursor.fetchone()
-                    if not next_stage:
-                        # Если следующего stage нет, возвращаем пустой список
-                        return []
-
-                    next_stage_id = next_stage[0]
-
-                    # Получаем stage_option_id выбранных опций текущего stage
+                    # Пытаемся найти доступные опции на основе выбранных опций и зависимостей
                     cursor.execute("""
                         SELECT stage_option_id FROM user_onboarding_stage_option
-                        WHERE user_id = %s AND user_onboarding_id = %s AND stage_id = %s
-                    """, (user_id, user_onboarding_id, current_stage_id))
+                        WHERE user_id = %s AND user_onboarding_id = %s
+                    """, (user_id, user_onboarding_id))
                     selected_option_ids = [option_id[0] for option_id in cursor.fetchall()]
 
                     if not selected_option_ids:
-                        return []
+                        # Если выбранных опций нет, сразу возвращаем все доступные опции для шага
+                        query = "SELECT id, stage_id, name, is_enabled, topic_id FROM stage_option WHERE stage_id = %s AND is_enabled = TRUE"
+                        cursor.execute(query, (target_stage_id,))
+                    else:
+                        selected_option_ids_placeholder = ', '.join(['%s'] * len(selected_option_ids))
+                        cursor.execute(f"""
+                            SELECT DISTINCT so.id, so.stage_id, so.name, so.is_enabled, so.topic_id FROM stage_option so
+                            INNER JOIN stage_option_dependency sod ON so.id = sod.child_option_id
+                            WHERE sod.parent_option_id IN ({selected_option_ids_placeholder})
+                            AND so.stage_id = %s AND so.is_enabled = TRUE
+                        """, tuple(selected_option_ids + [target_stage_id]))
 
-                    # Находим доступные опции для следующего stage, которые являются дочерними для выбранных опций
-                    selected_option_ids_placeholder = ', '.join(['%s'] * len(selected_option_ids))
-                    cursor.execute(f"""
-                        SELECT DISTINCT so.id, so.name, so.is_enabled, so.topic_id FROM stage_option so
-                        JOIN stage_option_dependency sod ON so.id = sod.child_option_id
-                        WHERE sod.parent_option_id IN ({selected_option_ids_placeholder}) AND so.stage_id = %s
-                    """, tuple(selected_option_ids + [next_stage_id]))
-                    next_stage_options = cursor.fetchall()
+                    options = cursor.fetchall()
 
-                    # Формируем список словарей для удобства работы с данными
-                    return [{"id": opt[0], "name": opt[1], "is_enabled": opt[2], "topic_id": opt[3]} for opt in
-                            next_stage_options]
+                    # Если после учета зависимостей список пуст, запрашиваем все доступные опции шага
+                    if not options:
+                        cursor.execute("""
+                            SELECT id, stage_id, name, is_enabled, topic_id FROM stage_option
+                            WHERE stage_id = %s AND is_enabled = TRUE
+                        """, (target_stage_id,))
+                        options = cursor.fetchall()
+
+                    # Преобразуем результаты в список словарей
+                    return [
+                        {"id": option[0], "stage_id": option[1], "name": option[2], "is_enabled": option[3],
+                         "topic_id": option[4]}
+                        for option in options
+                    ]
         except Exception as error:
-            print(f"Ошибка при получении опций для следующего шага: {error}")
+            print(f"Ошибка при получении опций для указанного шага: {error}")
             return []

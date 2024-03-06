@@ -20,6 +20,8 @@ db_config = {
     'host': '127.0.0.1'
 }
 
+dsn = 'dbname=interview_bot user=raisatramazanova password=qwerty host=127.0.0.1'
+
 STAGE_MAPPING_LEVELS = ['Junior', 'Middle', 'Senior']
 
 

@@ -62,3 +62,35 @@ class OnboardingRepository:
         except Exception as error:
             print(f"Ошибка при отметке завершения онбординга: {error}")
             return False
+
+    def finish_last_onboarding(self, user_id, chat_id):
+        """Завершает последнюю сессию онбординга пользователя, если она не завершена."""
+        try:
+            with self.db_connection.get_connection() as connection:
+                with connection.cursor() as cursor:
+                    # Проверяем, есть ли незавершенная сессия онбординга
+                    cursor.execute("""
+                        SELECT id FROM user_onboarding 
+                        WHERE user_id = %s AND chat_id = %s AND finished_at IS NULL
+                        ORDER BY started_at DESC LIMIT 1
+                    """, (user_id, chat_id))
+
+                    last_onboarding = cursor.fetchone()
+                    if last_onboarding:
+                        # Если незавершенная сессия найдена, обновляем finished_at
+                        query = """
+                            UPDATE user_onboarding 
+                            SET finished_at = %s 
+                            WHERE id = %s
+                        """
+                        finished_at = int(time.time())  # Получаем текущее время в формате UNIX timestamp
+                        cursor.execute(query, (finished_at, last_onboarding[0]))
+                        connection.commit()
+                        print("Последняя сессия онбординга успешно завершена.")
+                        return True
+                    else:
+                        print("Незавершенная сессия онбординга не найдена.")
+                        return False
+        except Exception as error:
+            print(f"Ошибка при попытке завершить последний онбординг: {error}")
+            return False

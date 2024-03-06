@@ -112,6 +112,7 @@ async def add_jump_button(button_text, callback_data='') -> InlineKeyboardMarkup
 
 
 def _(context: ContextTypes.DEFAULT_TYPE, message: str):
+
     return translations['ru'].get(message, "Translation not found")
 
 

@@ -83,3 +83,26 @@ class OnboardingStageOptionRepository:
         except Exception as error:
             print(f"Ошибка при проверке наличия опции этапа у пользователя: {error}")
             return False
+
+    def get_user_selected_option_names(self, user_id, user_onboarding_id, chat_id):
+        """Возвращает список названий выбранных пользователем опций для этапов, которые должны быть показаны."""
+        selected_option_names = []
+        try:
+            with self.db_connection.get_connection() as connection:
+                with connection.cursor() as cursor:
+                    query = """
+                    SELECT so.name
+                    FROM user_onboarding_stage_option uoso
+                    JOIN stage s ON uoso.stage_id = s.id
+                    JOIN stage_option so ON uoso.stage_option_id = so.id
+                    WHERE uoso.user_id = %s AND uoso.chat_id = %s AND uoso.user_onboarding_id = %s AND s.is_shown = TRUE AND so.is_enabled = TRUE
+                    """
+                    cursor.execute(query, (user_id, chat_id, user_onboarding_id))
+                    # Извлечение результатов
+                    for (option_name,) in cursor.fetchall():
+                        selected_option_names.append(option_name)
+            return selected_option_names
+        except Exception as error:
+            print(f"Ошибка при получении названий выбранных опций пользователя: {error}")
+            return selected_option_names
+
