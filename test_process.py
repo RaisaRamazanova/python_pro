@@ -1,5 +1,6 @@
-from database import get_question_from_data
+from repository.qustions_sql import get_question_from_data
 from interactor import *
+from user_state import *
 from telegram import Update
 from data.globals import STAGE_MAPPING_LEVELS
 from interactor import _
@@ -17,26 +18,15 @@ async def show_question_screen(update: Update, context: ContextTypes.DEFAULT_TYP
         for key in interview_data.number_of_questions_by_topic:
             if interview_data.selected_questions_by_topics[key] < interview_data.number_of_questions_by_topic[key]:
                 selected_id_list = get_interview_data(context).variable_data.selected_id_list
-                ls = []
-                for element in selected_id_list:
-                    if int(str(element)[1:6]) == key:
-                        ls.append(int(str(element)[7:]))
-                if len(ls) > 20:
-                    list_of_index = remove_most_frequent_elements(ls)
-                else:
-                    list_of_index = ls
-                id = get_random_number(context, list_of_index, 20)
-                for (k, v) in context.user_data['unique_codes'].items():
-                    if v == int(str(key)[:4]):
-                        with open('/Users/raisatramazanova/development/python_bot/python_pro_bot/data/four_answers.txt', 'r') as file:
-                            lines = file.readlines()
-                            for line in lines:
-                                if k == line.strip():
-                                    is_one_answer = False
-                        get_data(context).common_data.theme = k
-                        get_data(context).common_data.theme = themes[int(str(key)[:1]) - 1]
-                        get_data(context).common_data.section = k
-                        break
+                id = get_list_of_index(data, selected_id_list, key)
+                with open('/Users/raisatramazanova/development/python_bot/python_pro_bot/data/unique_codes.txt',
+                          'r') as file:
+                    for line in file:
+                        k, v = line.strip().split(' - ')
+                        if str(v)[:4] == str(key)[:4]:
+                            get_data(context).common_data.theme = themes[int(str(key)[:1]) - 1]
+                            get_data(context).common_data.section = k
+                            break
                 get_data(context).common_data.level = STAGE_MAPPING_LEVELS[int(str(key)[4:]) - 1]
                 question_id += str(key) + ('2' if is_one_answer else '1') + str(id)
                 break
@@ -44,20 +34,29 @@ async def show_question_screen(update: Update, context: ContextTypes.DEFAULT_TYP
         section = get_section_data(context)
         level = get_level_data(context)
         selected_id_list = get_level_data(context).variable_data.selected_id_list
-        ls = []
-        for element in selected_id_list:
-            ls.append(int(str(element)[7:]))
-        if len(ls) > 20:
-            list_of_index = remove_most_frequent_elements(ls)
-        else:
-            list_of_index = ls
-        id = get_random_number(context, list_of_index, 20)
+
+        id = get_list_of_index(data, selected_id_list)
         if section.code[0][0] == '3':
-            question_id += str(section.code[0]) + ('2' if is_one_answer else '1')+ str(id)
+            question_id += str(section.code[0]) + ('2' if is_one_answer else '1') + str(id)
         else:
             question_id += str(section.code[0]) + str(level.code[0]) + ('2' if is_one_answer else '1') + str(id)
 
     await get_question_from_data(update, context, int(question_id))
+
+
+def get_list_of_index(data, selected_id_list: [], key=None) -> int:
+    ls = []
+    for element in selected_id_list:
+        if data.common_data.is_interview:
+            if int(str(element)[1:6]) == key:
+                ls.append(int(str(element)[7:]))
+        else:
+            ls.append(int(str(element)[7:]))
+    if len(ls) > 19:
+        list_of_index = remove_most_frequent_elements(ls)
+    else:
+        list_of_index = ls
+    return get_random_number(list_of_index, 20)
 
 
 async def show_four_answers_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE, selected_answer_index, data,
@@ -143,12 +142,11 @@ async def compose_one_answer_feedback(context, chat_id, is_last, data, update, i
 async def send_feedback(context, chat_id, is_last, data, update, answer_feedback, start_text, end_button_text):
     total_text = start_text + ('{question}\n\n\n{answer_feedback}' +
                                _(context, '🧠 Explanation') +
-                               '{explanation_code}').format(
+                               '\n{explanation_code}').format(
         question=data.variable_data.question,
         answer_feedback=answer_feedback,
         explanation=data.variable_data.explanation,
         explanation_code=data.variable_data.explanation_code)
-    print('explanation_code = ', data.variable_data.explanation_code)
 
     button_text = end_button_text if is_last else _(context, 'Next question ➡️')
     next_button = InlineKeyboardButton(text=button_text, callback_data=button_text)
@@ -166,7 +164,8 @@ async def send_feedback(context, chat_id, is_last, data, update, answer_feedback
     data.variable_data.number_of_question += 1
     interview_data = get_interview_data(context)
     for key in interview_data.number_of_questions_by_topic:
-        if interview_data.selected_questions_by_topics[key] < interview_data.number_of_questions_by_topic[key]:
+        if interview_data.selected_questions_by_topics[key] < interview_data.number_of_questions_by_topic[
+            key] and get_data(context).common_data.is_interview:
             interview_data.selected_questions_by_topics[key] += 1
             break
     data.variable_data.selected_id_list.append(data.variable_data.question_id)
@@ -201,14 +200,14 @@ async def four_answers_question(question, explanation, explanation_code, list_of
     await show_question_with_four_answers(text, list_of_answers, update, context)
 
 
-async def one_answers_question(question, explanation, question_id, update, context):
+async def one_answers_question(question, explanation, explanation_code, question_id, update, context):
     is_interview = get_data(context).common_data.is_interview
     data = get_interview_data(context) if is_interview else get_level_data(context)
     data.variable_data.update(
         question=question,
         list_of_answers=[],
         explanation=explanation,
-        explanation_code='',
+        explanation_code=explanation_code if explanation_code is not None else '',
         correct_answer_index=0,
         question_id=question_id)
 

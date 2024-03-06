@@ -1,4 +1,5 @@
 from interactor import *
+from user_state import *
 from telegram import CallbackQuery
 from interactor import _
 

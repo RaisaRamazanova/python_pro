@@ -1,25 +1,15 @@
-import sqlite3
-from sqlite3 import Error, Connection
 import random
 import test_process
-from data.globals import data_path
 import openpyxl
 import json
+from repository.common_sql import create_connection, execute_query, execute_query_with_param
 
 
-def create_connection(path) -> Connection | None:
-    connection = None
-    try:
-        connection = sqlite3.connect(path)
-        print("Connection to SQLite DB successful")
-    except Error as e:
-        print(f"The error '{e}' occurred")
-
-    return connection
+printed_elements = set()
 
 
-def create_tables(path):
-    create_table = """
+def create_questions_table():
+    questions_table = """
     CREATE TABLE IF NOT EXISTS questions (
         id INTEGER PRIMARY KEY,
         question TEXT,
@@ -31,35 +21,8 @@ def create_tables(path):
         answer_4 TEXT
         );
     """
-    connection = create_connection(path)
-    execute_query(connection, create_table)
-
-
-def execute_query(connection, query):
-    try:
-        cursor = connection.cursor()
-        cursor.execute(query)
-        connection.commit()
-        print("Query executed successfully")
-    except Error as e:
-        print(f"The error '{e}' occurred")
-
-
-def execute_query_with_param(connection, sql, val):
-    try:
-        cursor = connection.cursor()
-        cursor.executemany(sql, val)
-        connection.commit()
-        print("Query executed successfully")
-        cursor.close()
-    except Error as e:
-        print(f"The error '{e}' occurred")
-    finally:
-        connection.close()
-        print("MySQL connection is closed")
-
-
-printed_elements = set()
+    connection = create_connection()
+    execute_query(connection, questions_table)
 
 
 def traverse_json(element, path=""):
@@ -77,15 +40,15 @@ def traverse_json(element, path=""):
 
 
 def add_questions():
-    file_path = '/Users/raisatramazanova/development/python_bot/python_pro_bot/data/stage_mapping.json'
+    file_path = '/data/stage_mapping.json'
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
         traverse_json(data)
-    create_tables(data_path)
+    create_questions_table()
 
     sql = """
      INSERT INTO questions (id, question, explanation, explanation_code, answer_1, answer_2, answer_3, answer_4)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
      """
 
     for element in printed_elements:
@@ -103,21 +66,21 @@ def add_questions():
                         id_val = ''.join(map(str, row[1:6]))
                         val = (id_val,) + tuple(row[6:14]) + tuple([''] * (13 - len(row)))
                         sheet.cell(row=row_number, column=1).value = 1
-                        data_connection = create_connection(data_path)
+                        data_connection = create_connection()
                         execute_query_with_param(data_connection, sql, (val,))
                     row_number += 1
-            wb.save(data_path)
+            wb.save(path)
         except Exception as e:
             print(f"An error occurred: {e}")
 
 
 async def get_question_from_data(update, context, question_id):
-    questions_connection = create_connection(data_path)
+    connection = create_connection()
 
-    cursor = questions_connection.cursor()
-    cursor.execute('SELECT id, question, explanation, explanation_code, answer_1, answer_2, answer_3, answer_4 FROM questions WHERE id = ?', (question_id,))
+    cursor = connection.cursor()
+    cursor.execute('SELECT id, question, explanation, explanation_code, answer_1, answer_2, answer_3, answer_4 FROM questions WHERE id = %s', (question_id,))
     data = cursor.fetchall()
-    questions_connection.commit()
+    connection.commit()
 
     last_four_elements = data[0][-4:]
     list_of_answers = [(last_four_elements[0], 1), (last_four_elements[1], 0), (last_four_elements[2], 0),
@@ -129,4 +92,4 @@ async def get_question_from_data(update, context, question_id):
                                                  update,
                                                  context)
     else:
-        await test_process.one_answers_question(data[0][1], data[0][2], question_id, update, context)
+        await test_process.one_answers_question(data[0][1], data[0][2], data[0][3], question_id, update, context)

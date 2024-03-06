@@ -1,7 +1,8 @@
 from telegram import Update
 from data.globals import PAYMENTS_TOKEN
 from telegram.ext import ContextTypes
-from interactor import get_section_data, get_level_data, delete_message, _
+from user_state import get_section_data, get_level_data
+from interactor import delete_message, _
 from telebot.types import LabeledPrice
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from screens_bulder import show_section_start_screen

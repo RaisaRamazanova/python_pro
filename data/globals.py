@@ -5,8 +5,6 @@ from telegram.ext import ApplicationBuilder
 TOKEN = "6914866790:AAHQFOHkYzPqRSByECISnNwGRLy1uXFieU8"
 PAYMENTS_TOKEN = '381764678:TEST:76546'
 
-data_path = '/Users/raisatramazanova/development/python_bot/python_pro_bot/data.sqlite'
-
 logger = logging.getLogger(__name__)
 application = ApplicationBuilder().token(TOKEN).build()
 lock = threading.Lock()
@@ -15,16 +13,15 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
-types_of_topics = {
-    'languages': 1,
-    'frameworks': 2,
-    'tools': 3,
-    'options': 4,
+db_config = {
+    'dbname': 'interview_bot',
+    'user': 'raisatramazanova',
+    'password': 'qwerty',
+    'host': '127.0.0.1'
 }
 
 STAGE_MAPPING_LEVELS = ['Junior', 'Middle', 'Senior']
 
-STAGE_MAPPING = {}
 
 # STAGE_MAPPING = {
 #     "Backend": {
@@ -42,7 +39,7 @@ STAGE_MAPPING = {}
 #                 "tools": ["Docker", "Kubernetes", "RabbitMQ", "Consul"]
 #             },
 #             "Database Management": {
-#                 "languages": ["SQL", "NoSQL"],
+#                 "languages": ["repository", "NoSQL"],
 #                 "frameworks": ["MySQL", "PostgreSQL", "MongoDB", "Cassandra"],
 #                 "tools": ["DBeaver", "MongoDB Compass", "pgAdmin"]
 #             },
@@ -220,7 +217,7 @@ STAGE_MAPPING = {}
 #     #             "frameworks": ["TensorFlow", "PyTorch", "Scikit-learn"]
 #     #         },
 #     #         "Data Analysis": {
-#     #             "languages": ["Python", "R", "SQL"],
+#     #             "languages": ["Python", "R", "repository"],
 #     #             "tools": ["Pandas", "NumPy", "Matplotlib"],
 #     #             "frameworks": ["Pandas", "NumPy"]
 #     #         },
@@ -245,7 +242,7 @@ STAGE_MAPPING = {}
 #     #     "options": ["Business Analysis", "Systems Design", "Requirement Analysis", "Process Modeling", "Data Modeling"],
 #     #     "next": {
 #     #         "Business Analysis": {
-#     #             "languages": ["UML", "Markdown", "SQL"],
+#     #             "languages": ["UML", "Markdown", "repository"],
 #     #             "tools": ["Microsoft Visio", "Lucidchart", "Balsamiq"],
 #     #             "frameworks": ["Babok", "UML"]
 #     #         },
@@ -265,7 +262,7 @@ STAGE_MAPPING = {}
 #     #             "frameworks": ["BPMN", "Aris"]
 #     #         },
 #     #         "Data Modeling": {
-#     #             "languages": ["SQL", "UML", "ERD"],
+#     #             "languages": ["repository", "UML", "ERD"],
 #     #             "tools": ["ER/Studio", "Navicat", "Microsoft Visio"],
 #     #             "frameworks": ["ER/Studio", "PowerDesigner"]
 #     #         }

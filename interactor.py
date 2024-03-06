@@ -3,21 +3,11 @@ from data.translations import translations
 from data.globals import application
 from telegram.ext import ContextTypes
 import random
-from model import UserData, Level, Section, Interview, Theme
-from telegram import Update
 from collections import Counter
 import matplotlib.pyplot as plt
 import numpy as np
 from typing import IO
 from io import BytesIO
-
-
-def get_chat_id(update: Update):
-    return update.message.chat_id if update.message else update.callback_query.message.chat_id
-
-
-def get_message_id(update: Update):
-    return update.message.message_id if update.message else update.message.chat.id
 
 
 async def send_message(chat_id: int, text: str, reply_markup: InlineKeyboardMarkup | None = None,
@@ -94,65 +84,15 @@ async def create_buttons(list_of_buttons):
         raise TypeError("list_of_buttons должен быть типа list или dict")
 
 
-def get_random_number(context: ContextTypes.DEFAULT_TYPE, selected_id_list: [], end: int = 3) -> int:
+def get_random_number(selected_id_list: [], end: int = 3) -> int:
     random_number = random.randint(1, end)
 
     if random_number in selected_id_list:
         print(f"Generated {random_number}")
-        return get_random_number(context, selected_id_list)
+        return get_random_number(selected_id_list)
 
-    print(f"Generated {random_number}, it's not in the list.")
+    print(f"Generated {random_number}")
     return random_number
-
-
-def get_data(context: ContextTypes.DEFAULT_TYPE) -> UserData | None:
-    if 'data' in context.user_data:
-        return context.user_data['data']
-    else:
-        return None
-
-
-def get_level_name(context: ContextTypes.DEFAULT_TYPE) -> str:
-    data = get_data(context)
-    if data is not None:
-        return data.common_data.level
-    return ""
-
-
-def get_level_data(context: ContextTypes.DEFAULT_TYPE) -> Level | None:
-    data = get_data(context)
-    section = get_section_data(context)
-    if data is not None:
-        for level in section.levels:
-            if level.name == data.common_data.level:
-                return level
-    return None
-
-
-def get_interview_data(context: ContextTypes.DEFAULT_TYPE) -> Interview | None:
-    data = get_data(context)
-    if data is not None:
-        return data.interview_data
-    return None
-
-
-def get_section_data(context: ContextTypes.DEFAULT_TYPE) -> Section | None:
-    data = get_data(context)
-    theme = get_theme(context)
-    if data is not None:
-        for s in theme.sections:
-            if s.name == data.common_data.section:
-                return s
-    return None
-
-
-def get_theme(context: ContextTypes.DEFAULT_TYPE) -> Theme | None:
-    data = get_data(context)
-    if data is not None:
-        for theme in data.theme_data:
-            if theme.name == data.common_data.theme:
-                return theme
-    return None
 
 
 def remove_most_frequent_elements(lst) -> []:
@@ -171,12 +111,8 @@ async def add_jump_button(button_text, callback_data='') -> InlineKeyboardMarkup
     return reply_markup
 
 
-def change_level(context, level: str):
-    context.user_data['data'].common_data.level = level
-
-
 def _(context: ContextTypes.DEFAULT_TYPE, message: str):
-    return translations[context.user_data['data'].common_data.user_language].get(message, "Translation not found")
+    return translations['ru'].get(message, "Translation not found")
 
 
 def choose_color(value):
