@@ -1,6 +1,5 @@
 from interactor import *
-from user_state import *
-from telegram import CallbackQuery
+from telegram import CallbackQuery, Update
 from interactor import _
 from onboarding import app_config
 from test_process import show_question_screen
@@ -204,36 +203,38 @@ async def show_pay_screen(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 reply_markup=reply_markup)
 
 
-async def show_interview_results_screen(update, context):
-    interview = get_interview_data(context)
-    interview.deleting_message_id = update.callback_query.message.message_id
+async def show_interview_results_screen(update, context, interview_id):
+    # app_config['interview_results_repo'].
+    # interview = get_interview_data(context)
+    # interview.deleting_message_id = update.callback_query.message.message_id
 
-    if len(interview.results) > 1:
-        reply_markup = await add_jump_button(_(context, "To the main menu ⬅️"), callback_data="back to the main menu and delete image")
 
-        text = _(context, 'interview results')
-        photo = send_graph(context, len(interview.results), interview.results)
-
-        invoice_message_id = interview.deleting_message_id
-        if invoice_message_id:
-            try:
-                await delete_message(
-                    chat_id=get_data(context).common_data.chat_id,
-                    message_id=invoice_message_id)
-            except Exception as e:
-                print(f"Не удалось удалить сообщение: {e}")
-
-            await send_image(
-                chat_id=get_data(context).common_data.chat_id,
-                photo=photo, caption=text,
-                reply_markup=reply_markup)
-
-    else:
+    # if len(interview.results) > 1:
+    #     reply_markup = await add_jump_button(_(context, "To the main menu ⬅️"), callback_data="back to the main menu and delete image")
+    #
+    #     text = _(context, 'interview results')
+    #     photo = send_graph(context, len(interview.results), interview.results)
+    #
+    #     invoice_message_id = interview.deleting_message_id
+    #     if invoice_message_id:
+    #         try:
+    #             await delete_message(
+    #                 chat_id=get_chat_id(update),
+    #                 message_id=invoice_message_id)
+    #         except Exception as e:
+    #             print(f"Не удалось удалить сообщение: {e}")
+    #
+    #         await send_image(
+    #             chat_id=get_chat_id(update),
+    #             photo=photo, caption=text,
+    #             reply_markup=reply_markup)
+    #
+    # else:
         reply_markup = await add_jump_button(_(context, "To the main menu ⬅️"), callback_data="back to the main menu")
 
         text = _(context, 'not enough data')
         await edit_message(
-            chat_id=get_data(context).common_data.chat_id,
+            chat_id=get_chat_id(update),
             message_id=update.callback_query.message.message_id,
             text=text,
             reply_markup=reply_markup)

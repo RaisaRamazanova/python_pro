@@ -1,4 +1,5 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update
 from data.translations import translations
 from data.globals import application
 from telegram.ext import ContextTypes
@@ -8,6 +9,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 from typing import IO
 from io import BytesIO
+
+
+def get_chat_id(update: Update):
+    return update.message.chat_id if update.message else update.callback_query.message.chat_id
+
+
+def get_message_id(update):
+    if update.message:
+        return update.message.message_id
+    elif update.callback_query and update.callback_query.message:
+        return update.callback_query.message.message_id
+    else:
+        return None
 
 
 async def send_message(chat_id: int, text: str, reply_markup: InlineKeyboardMarkup | None = None,
@@ -84,15 +98,21 @@ async def create_buttons(list_of_buttons):
         raise TypeError("list_of_buttons должен быть типа list или dict")
 
 
-def get_random_number(selected_id_list: [], end: int = 3) -> int:
-    random_number = random.randint(1, end)
+# def get_random_number(selected_id_list: [], end: int = 3) -> int:
+#     random_number = random.randint(1, end)
+#
+#     if random_number in selected_id_list:
+#         print(f"Generated {random_number}")
+#         return get_random_number(selected_id_list)
+#
+#     print(f"Generated {random_number}")
+#     return random_number
 
-    if random_number in selected_id_list:
-        print(f"Generated {random_number}")
-        return get_random_number(selected_id_list)
 
-    print(f"Generated {random_number}")
-    return random_number
+def pick_random_number(number_list):
+    if not number_list:
+        return None
+    return random.choice(number_list)
 
 
 def remove_most_frequent_elements(lst) -> []:

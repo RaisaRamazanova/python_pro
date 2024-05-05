@@ -42,14 +42,14 @@ class InterviewRepository:
             return False
 
     def get_last_unfinished_interview_id(self, user_id, chat_id):
-        """Получает идентификатор последнего незавершенного интервью для пользователя."""
+        """Получает идентификатор последнего по ID незавершенного интервью для пользователя."""
         try:
             with self.db_connection.get_connection() as connection:
                 with connection.cursor() as cursor:
                     query = """
                     SELECT id FROM interview
                     WHERE user_id = %s AND chat_id = %s AND finished_at IS NULL
-                    ORDER BY started_at DESC LIMIT 1;
+                    ORDER BY id DESC LIMIT 1;
                     """
                     cursor.execute(query, (user_id, chat_id))
                     result = cursor.fetchone()

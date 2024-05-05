@@ -3,6 +3,41 @@ class StageOptionRepository:
     def __init__(self, db_connection):
         self.db_connection = db_connection
 
+    # def add_stage_options(self):
+    #     connection = self.db_connection.get_connection()
+    #     cursor = connection.cursor()
+    #     try:
+    #         for domain, details in STAGE_MAPPING.items():
+    #             # Домены (основные категории) с stage_id = 1
+    #             cursor.execute("INSERT INTO stage_option (stage_id, name, is_enabled) VALUES (%s, %s, %s) ON CONFLICT (name) DO NOTHING",
+    #                            (1, domain, True))
+    #             for option in details["options"]:
+    #                 # Подкатегории с stage_id = 2
+    #                 cursor.execute("INSERT INTO stage_option (stage_id, name, is_enabled) VALUES (%s, %s, %s) ON CONFLICT (name) DO NOTHING",
+    #                                (2, option, True))
+    #                 next_details = details["next"].get(option)
+    #                 if next_details:
+    #                     for language in next_details.get("languages", []):
+    #                         # Языки программирования с stage_id = 3
+    #                         cursor.execute("INSERT INTO stage_option (stage_id, name, is_enabled) VALUES (%s, %s, %s) ON CONFLICT (name) DO NOTHING",
+    #                                        (3, language, True))
+    #                     for framework in next_details.get("frameworks", []):
+    #                         # Фреймворки с stage_id = 4
+    #                         cursor.execute("INSERT INTO stage_option (stage_id, name, is_enabled) VALUES (%s, %s, %s) ON CONFLICT (name) DO NOTHING",
+    #                                        (4, framework, True))
+    #                     for tool in next_details.get("tools", []):
+    #                         # Инструменты с stage_id = 5
+    #                         cursor.execute("INSERT INTO stage_option (stage_id, name, is_enabled) VALUES (%s, %s, %s) ON CONFLICT (name) DO NOTHING",
+    #                                        (5, tool, True))
+    #                     # Если бы были уровни, они были бы с stage_id = 6, но в данном примере уровни не представлены
+    #         connection.commit()
+    #     except Exception as e:
+    #         connection.rollback()
+    #         print(f"Ошибка: {e}")
+    #     finally:
+    #         cursor.close()
+
+
     def get_stage_option_by_id(self, option_id):
         """Возвращает детали опции этапа по её ID в виде словаря."""
         try:

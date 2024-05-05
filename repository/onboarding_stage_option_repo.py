@@ -8,6 +8,10 @@ class OnboardingStageOptionRepository:
     def toggle_stage_option(self, user_id, chat_id, user_onboarding_id, user_onboarding_stage_id, stage_id,
                             stage_option_id):
         """Добавляет или удаляет опцию в этапе, в зависимости от её текущего состояния, и возвращает строку с описанием действия."""
+        if stage_option_id is None:
+            print("Ошибка: stage_option_id не может быть null.")
+            return None  # Возвращаем None или обрабатываем ошибку соответствующим образом
+
         try:
             with self.db_connection.get_connection() as connection:
                 with connection.cursor() as cursor:

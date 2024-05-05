@@ -1,5 +1,4 @@
 import time
-from data.globals import dsn
 
 
 class OnboardingStageRepository:
@@ -77,13 +76,11 @@ class OnboardingStageRepository:
                     # Шаг 1: Находим ID последнего незавершенного онбординга
                     cursor.execute("""
                     SELECT id FROM user_onboarding
-                    WHERE finished_at IS NULL
-                    AND user_id = %s
-                    ORDER BY started_at DESC
-                    LIMIT 1
-                    """, (str(user_id)))
+                    WHERE finished_at IS NULL AND user_id = %s
+                    ORDER BY started_at DESC LIMIT 1
+                    """, (user_id,))
                     latest_onboarding = cursor.fetchone()
-                    if not latest_onboarding:
+                    if latest_onboarding is None:
                         return None  # Нет незавершенных онбордингов
 
                     user_onboarding_id = latest_onboarding[0]
@@ -92,8 +89,7 @@ class OnboardingStageRepository:
                     cursor.execute("""
                     SELECT stage_id FROM user_onboarding_stage
                     WHERE user_onboarding_id = %s
-                    ORDER BY created_at DESC
-                    LIMIT 1
+                    ORDER BY created_at DESC LIMIT 1
                     """, (user_onboarding_id,))
                     latest_stage_id_record = cursor.fetchone()
                     if not latest_stage_id_record:

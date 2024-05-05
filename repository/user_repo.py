@@ -5,7 +5,7 @@ class UserRepository:
     def __init__(self, db_connection):
         self.db_connection = db_connection
 
-    def get_language(self, chat_id):
+    def get_language_id(self, chat_id):
         """Возвращает предпочитаемый язык пользователя по chat_id."""
         try:
             connection = self.db_connection.get_connection()

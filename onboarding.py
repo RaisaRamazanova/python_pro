@@ -1,7 +1,6 @@
 from data import translations
 from interactor import *
 import screens_bulder
-from user_state import *
 from telegram import CallbackQuery
 from interactor import _
 from repository.database import create_app_config
@@ -12,6 +11,7 @@ app_config = create_app_config(db_config)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    print('start')
     app_config['user_repo'].create(
         telegram_id=update.effective_user.id,
         telegram_username=update.effective_user.username,
@@ -63,7 +63,7 @@ async def show_onboarding(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
         user_id=user_id,
         user_onboarding_id=user_onboarding_id
     )
-    language_id = app_config['user_repo'].get_language(chat_id=update.callback_query.message.chat.id)
+    language_id = app_config['user_repo'].get_language_id(chat_id=update.callback_query.message.chat.id)
     current_stage = app_config['onboarding_stage_repo'].get_latest_onboarding_stage_details(user_id=user_id)
     stage_translate = app_config['stage_repo'].get_stage_translate(
         stage_id=current_stage['id'],
@@ -93,7 +93,7 @@ async def show_onboarding(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
                 user_id=user_id,
                 chat_id=get_chat_id(update)
             )
-
+            app_config['user_level_repo'].record_user_levels(user_id=user_id)
             await screens_bulder.show_main_screen(update, context, query)
     else:
         stage_option_id = app_config['stage_option_repo'].get_stage_option_id_by_name(

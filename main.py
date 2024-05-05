@@ -6,6 +6,8 @@ from data.globals import application, logger
 from onboarding import start
 from telegram import Update
 from telegram.ext import CommandHandler
+import os
+import sys
 
 
 def main():
@@ -29,4 +31,19 @@ def error_handler(update, context):
 
 
 if __name__ == '__main__':
-    main()
+    lock_file_path = "/tmp/my_bot.lock"
+
+    # Check if the lock file already exists
+    if os.path.exists(lock_file_path):
+        print("Another instance of the bot is already running.")
+        sys.exit()
+
+    # Create a lock file to signify that the bot is running
+    with open(lock_file_path, 'w') as lock_file:
+        lock_file.write("Running")
+
+    try:
+        main()
+    finally:
+        # Remove the lock file when the bot is done, to allow future instances to run
+        os.remove(lock_file_path)
