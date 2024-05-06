@@ -1,8 +1,8 @@
 from data import translations
-from interactor import *
-import screens_bulder
+from handlers.interactor import *
+import services.main_screen_service as main_screen
 from telegram import CallbackQuery
-from interactor import _
+from handlers.interactor import _
 from repository.database import create_app_config
 from data.globals import db_config
 
@@ -11,7 +11,6 @@ app_config = create_app_config(db_config)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print('start')
     app_config['user_repo'].create(
         telegram_id=update.effective_user.id,
         telegram_username=update.effective_user.username,
@@ -25,7 +24,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     language = app_config['user_repo'].get_user_language_code(get_chat_id(update))
     welcome_text = translations[language]['welcome_message']
     buttons = [
-        InlineKeyboardButton(translations['en']['start'], callback_data=translations['en']['start']),
         InlineKeyboardButton(translations['ru']['start'], callback_data=translations['ru']['start'])
     ]
 
@@ -74,6 +72,8 @@ async def show_onboarding(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
                 user_id=user_id,
                 user_onboarding_id=user_onboarding_id,
                 user_onboarding_stage_id=user_onboarding_stage_id):
+            await show_onboarding_page(update, context, query, user_id, user_onboarding_id, stage_translate + "❗️",
+                                       current_stage)
             return
 
         next_onboarding_stage = app_config['onboarding_stage_repo'].start_next_onboarding_stage(
@@ -94,7 +94,7 @@ async def show_onboarding(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
                 chat_id=get_chat_id(update)
             )
             app_config['user_level_repo'].record_user_levels(user_id=user_id)
-            await screens_bulder.show_main_screen(update, context, query)
+            await main_screen.show(update, context, query)
     else:
         stage_option_id = app_config['stage_option_repo'].get_stage_option_id_by_name(
             option_name=query.data
@@ -117,7 +117,7 @@ async def show_onboarding_page(update: Update, context: ContextTypes.DEFAULT_TYP
         target_stage_id=current_stage['id']
     )
 
-    reply_markup = generate_keyboard(update, context, current_stage, stage_options, 'Дальше')
+    reply_markup = generate_keyboard(update, context, current_stage, stage_options, _(context, "Further"))
 
     await query.edit_message_text(text=stage_description, reply_markup=reply_markup.to_json())
 

@@ -4,7 +4,6 @@ from data.translations import translations
 from data.globals import application
 from telegram.ext import ContextTypes
 import random
-from collections import Counter
 import matplotlib.pyplot as plt
 import numpy as np
 from typing import IO
@@ -61,12 +60,6 @@ async def edit_message(chat_id: int, message_id: int, text: str, reply_markup: I
         print(f"Произошла ошибка при изменении сообщения: {e}")
 
 
-async def send_sticker(chat_id: int, sticker: str):
-    await application.bot.send_sticker(
-        chat_id=chat_id,
-        sticker=sticker)
-
-
 async def send_image(chat_id: int, photo: IO[bytes], caption: str, reply_markup: InlineKeyboardMarkup | None = None):
     await application.bot.send_photo(
         chat_id=chat_id,
@@ -98,30 +91,10 @@ async def create_buttons(list_of_buttons):
         raise TypeError("list_of_buttons должен быть типа list или dict")
 
 
-# def get_random_number(selected_id_list: [], end: int = 3) -> int:
-#     random_number = random.randint(1, end)
-#
-#     if random_number in selected_id_list:
-#         print(f"Generated {random_number}")
-#         return get_random_number(selected_id_list)
-#
-#     print(f"Generated {random_number}")
-#     return random_number
-
-
 def pick_random_number(number_list):
     if not number_list:
         return None
     return random.choice(number_list)
-
-
-def remove_most_frequent_elements(lst) -> []:
-    if lst:
-        element_counts = Counter(lst)
-        max_count = max(element_counts.values())
-        filtered_list = [element for element in lst if element_counts[element] != max_count]
-        return filtered_list
-    return []
 
 
 async def add_jump_button(button_text, callback_data='') -> InlineKeyboardMarkup:
@@ -132,7 +105,6 @@ async def add_jump_button(button_text, callback_data='') -> InlineKeyboardMarkup
 
 
 def _(context: ContextTypes.DEFAULT_TYPE, message: str):
-
     return translations['ru'].get(message, "Translation not found")
 
 

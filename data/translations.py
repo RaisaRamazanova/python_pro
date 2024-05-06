@@ -29,7 +29,7 @@ translations = {
         "Something went wrong with the payment": "Something went wrong with the payment",
         "Buy 💰": "Buy 💰",
         "Back ⬅️": "Back ⬅️",
-        "This is a paid level": "This is a paid level. It is currently locked 🔒\n\n<b>You can buy it 💰</b>",
+        "Unlimited access to Frontend interviews is blocked": "Unlimited access to Frontend interviews is blocked 🔒\n\n<b>You can buy unlimited 💰</b>",
         "Finish training": "Finish training",
         "You have finished the training on {theme}": "<b>You have finished the training on {theme}!</b>\n\nCorrectly completed {percent}% ({correct} out of {questions_count})",
         "Finish the interview": "Finish the interview",
@@ -64,7 +64,8 @@ translations = {
         'I know': 'I know ✅',
         'I don\'t know': 'I don\'t know ❌',
         'You know the answer': ' ✅ You know the answer\n\n',
-        'You don\'t know the answer': '❌ You don\'t know the answer\n\n'
+        'You don\'t know the answer': '❌ You don\'t know the answer\n\n',
+        'Further': 'Further ➡️'
     },
     "ru": {
         "welcome_message": "🌟 Добро пожаловать в Interview Hack! 🌟\n\nЯ здесь, чтобы помочь тебе подготовиться к "
@@ -96,7 +97,7 @@ translations = {
         "Something went wrong with the payment": "Что-то пошло не так с оплатой",
         "Buy 💰": "Купить 💰",
         "Back ⬅️": "Назад ⬅️",
-        "This is a paid level": "Это платный уровень. Пока он заблокирован 🔒\n\n<b>Ты можешь купить его 💰</b>",
+        "Unlimited access to Frontend interviews is blocked": "Безлимитный доступ к собеседования по Frontend заблокирован 🔒\n\n<b>Ты можешь купить безлимит 💰</b>",
         "Finish training": "Закончить тренировку",
         "You have finished the training on {theme}": "<b>Ты закончил тренировку по {theme}!</b>\n\nПравильно выполнено {percent}% ({correct} из {questions_count})",
         "Finish the interview": "Закончить собеседование",
@@ -131,7 +132,8 @@ translations = {
         'I know': 'Знаю ✅',
         'I don\'t know': 'Не знаю ❌',
         'You know the answer': ' ✅ Ты знаешь ответ\n\n',
-        'You don\'t know the answer': '❌ Ты не знаешь ответ\n\n'
+        'You don\'t know the answer': '❌ Ты не знаешь ответ\n\n',
+        'Further': 'Дальше ➡️'
     },
     "es": {
         "welcome_message": "🌟 ¡Bienvenido a Interview Hack! 🌟\n\nEstoy aquí para ayudarte a prepararte para las "
@@ -142,15 +144,15 @@ translations = {
         "start": "Comenzar en español 🚀",
         "Choose the domains": "Elija los dominios (al menos un):",
         "To subcategories ➡️": "A subcategorías ➡️",
-        "Choose the subcategories": "Elige las subcategorías (al menos una):",
+        "Choose the subcategories": "Elige las subcategorías (al menos una)",
         "To programming languages ➡️": "A lenguajes de programación ➡️",
-        "Choose programming languages": "Elige lenguajes de programación:",
+        "Choose programming languages": "Elige lenguajes de programación",
         "To frameworks ➡️": "A frameworks ➡️",
-        "Choose frameworks": "Elige frameworks:",
+        "Choose frameworks": "Elige frameworks",
         "To tools ➡️": "A herramientas ➡️",
-        "Choose tools": "Elige herramientas:",
+        "Choose tools": "Elige herramientas",
         "To levels ➡️": "A niveles ➡️",
-        "Choose levels": "Elige niveles (al menos un):",
+        "Choose levels": "Elige niveles (al menos un)",
         "Finish ➡️": "Finalizar ➡️",
         "Programming languages": "Lenguajes de programación",
         "Frameworks": "Frameworks",
@@ -163,7 +165,7 @@ translations = {
         "Something went wrong with the payment": "Algo salió mal con el pago",
         "Buy 💰": "Comprar 💰",
         "Back ⬅️": "Atrás ⬅️",
-        "This is a paid level": "Este es un nivel de pago. Actualmente está bloqueado 🔒\n\n<b>Puedes comprarlo 💰</b>",
+        "Unlimited access to Frontend interviews is blocked": "El acceso ilimitado a entrevistas en el Frontend está bloqueado 🔒\n\n<b>Puedes comprar de forma ilimitada 💰</b>",
         "Finish training": "Finalizar entrenamiento",
         "<b>You have finished the training on {theme}": "<b>¡Has terminado el entrenamiento en {theme}!</b>\n\nCompletado correctamente {percent}% ({correct} de {questions_count})",
         "Finish the interview": "Finalizar la entrevista",
@@ -198,6 +200,7 @@ translations = {
         'Lo sé': 'Lo sé ✅',
         'No lo sé': 'No lo sé ❌',
         'You know the answer': ' ✅ Tu sabes la respuesta\n\n',
-        'You don\'t know the answer': '❌ No sabes la respuesta\n\n'
+        'You don\'t know the answer': '❌ No sabes la respuesta\n\n',
+        'Further': 'Más ➡️'
     }
 }

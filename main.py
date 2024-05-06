@@ -1,14 +1,17 @@
 from telegram.ext import CallbackQueryHandler, PreCheckoutQueryHandler, filters, \
     MessageHandler
-from button_handlers import button
-from payment import successful_payment_callback, handle_pre_checkout
+from handlers.button_handlers import button
+from services.payment_service import successful_payment_callback, handle_pre_checkout
 from data.globals import application, logger
-from onboarding import start
+from services.onboarding_service import start
 from telegram import Update
 from telegram.ext import CommandHandler
 import os
 import sys
+import atexit
 
+
+lock_file_path = "/tmp/my_bot.lock"
 
 def main():
     application.add_handler(CommandHandler("start", start))
@@ -30,8 +33,15 @@ def error_handler(update, context):
         logger.info("Update or effective_message not available for this error.")
 
 
+def cleanup():
+    try:
+        os.remove(lock_file_path)
+    except:
+        print("The lock file was already deleted")
+
+
 if __name__ == '__main__':
-    lock_file_path = "/tmp/my_bot.lock"
+    atexit.register(cleanup)
 
     # Check if the lock file already exists
     if os.path.exists(lock_file_path):
